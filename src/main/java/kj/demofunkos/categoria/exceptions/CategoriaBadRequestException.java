@@ -1,12 +1,12 @@
-package kj.demofunkos.funko.exceptions;
+package kj.demofunkos.categoria.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class FunkoBadRequestException  extends FunkoException {
-    public FunkoBadRequestException(String message) {
+public class CategoriaBadRequestException extends CategoriaException {
+
+    public CategoriaBadRequestException(String message){
         super(message);
     }
 }
-

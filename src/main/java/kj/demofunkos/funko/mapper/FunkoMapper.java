@@ -26,7 +26,8 @@ public class FunkoMapper {
                 funkoUpdateDto.getPrecio() != null ? funkoUpdateDto.getPrecio() : funkoViejo.getPrecio(),
                 funkoViejo.getFechaAlta(),
                 LocalDateTime.now(),
-                false
+                false,
+                funkoViejo.getDetalles()
         );
     }
 }

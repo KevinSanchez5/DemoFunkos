@@ -37,6 +37,9 @@ public class Funko {
     @Column(name = "borrado")
     private boolean borrado = false;
 
+    @Embedded
+    private Detalles detalles;
+
     public Funko() {}
 
     public Funko(String nombre, Double precio) {
