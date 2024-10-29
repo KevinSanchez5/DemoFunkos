@@ -1,38 +1,28 @@
 package kj.demofunkos.funko.repository;
 
 import kj.demofunkos.funko.model.Funko;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 @Repository
-public class FunkoRepository {
+public interface FunkoRepository extends JpaRepository<Funko, Long> {
 
-    private Map<Long,Funko> funkos = new HashMap<>();
+    @Query("select f from Funko f where upper(f.nombre) = upper(?1)")
+    Optional<Funko> findByNombreIgnoreCase(String nombre);
 
-    public List<Funko> findAll() {
-        return List.copyOf(funkos.values());
-    }
+    @Query("SELECT f FROM Funko f WHERE f.precio > ?1")
+    List<Funko> findByPriceGreaterThan(Double price);
 
-    public Funko findById(Long id) {
-        return funkos.get(id);
-    }
+    @Query("SELECT f FROM Funko f WHERE f.precio < ?1")
+    List<Funko> findByPriceLessThan(Double price);
 
-    public Funko save(Funko funko) {
-        funkos.put(funko.getId(), funko);
-        return funko;
-    }
+    @Query("SELECT f FROM Funko f WHERE upper(f.nombre) LIKE concat('%', upper(?1), '%') ")
+    List<Funko> findByNombreContainingIgnoreCase(String nombre);
 
-    public Funko update(Long id, Funko funko) {
-        funkos.put(id, funko);
-        return funko;
-    }
-
-    public Funko deleteById(Long id) {
-        return funkos.remove(id);
-    }
-
-
+    @Query("SELECT f FROM Funko f WHERE f.precio > ?1 AND f.precio < ?2")
+    List<Funko> findByPrecioBetween(Double minimo, Double maximo);
 }

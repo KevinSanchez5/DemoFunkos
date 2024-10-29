@@ -7,7 +7,7 @@ import kj.demofunkos.funko.exceptions.FunkoNotFoundException;
 import kj.demofunkos.funko.mapper.FunkoMapper;
 import kj.demofunkos.funko.model.Funko;
 import kj.demofunkos.funko.repository.FunkoRepository;
-import kj.demofunkos.funko.validator.Validador;
+import kj.demofunkos.funko.validator.FunkoValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -33,7 +34,7 @@ class FunkoServiceTest {
     private FunkoMapper mapper;
 
     @Mock
-    private Validador validador;
+    private FunkoValidator funkoValidator;
 
     @InjectMocks
     private FunkoService service;
@@ -53,7 +54,7 @@ class FunkoServiceTest {
 
     @Test
     void findById() {
-        when(repository.findById(1L)).thenReturn(funko);
+        when(repository.findById(1L)).thenReturn(Optional.of(funko));
 
         Funko funkoBuscado = service.findById(1L);
 
@@ -68,7 +69,7 @@ class FunkoServiceTest {
 
     @Test
     void findByIdNotFound(){
-        when(repository.findById(1L)).thenReturn(null);
+        when(repository.findById(1L)).thenReturn(Optional.empty());
 
         FunkoNotFoundException e= assertThrows(FunkoNotFoundException.class, () -> service.findById(1L));
         assertEquals("Funko con id 1 no encontrado", e.getMessage());
@@ -97,10 +98,10 @@ class FunkoServiceTest {
 
     @Test
     void update() {
-        doNothing().when(validador).validarFunkoUpdateDto(updateDto);
-        when(repository.findById(1L)).thenReturn(funko);
+        doNothing().when(funkoValidator).validarFunkoUpdateDto(updateDto);
+        when(repository.findById(1L)).thenReturn(Optional.of(funko));
         when(mapper.fromUpdateToEntity(funko, updateDto)).thenReturn(funko);
-        when(repository.update(1L,funko)).thenReturn(funko);
+        when(repository.save(funko)).thenReturn(funko);
 
         Funko funkoActualizado = service.update(1L, updateDto);
 
@@ -112,42 +113,70 @@ class FunkoServiceTest {
                 () -> assertEquals(funko.getFechaModificacion(), funkoActualizado.getFechaModificacion()),
                 () -> assertEquals(funko.getFechaAlta(), funkoActualizado.getFechaAlta())
         );
-        verify(validador).validarFunkoUpdateDto(updateDto);
-        verify(repository).findById(1L);
-        verify(mapper).fromUpdateToEntity(funko, updateDto);
-        verify(repository).update(1L, funko);
+        verify(funkoValidator, times(1)).validarFunkoUpdateDto(updateDto);
+        verify(repository,times(1)).findById(1L);
+        verify(mapper, times(1)).fromUpdateToEntity(funko, updateDto);
+        verify(repository, times(1)).save(funko);
     }
 
     @Test
     void updateFunkoNotFound() throws FunkoException {
-        doNothing().when(validador).validarFunkoUpdateDto(updateDto);
-        when(repository.findById(1L)).thenReturn(null);
+        doNothing().when(funkoValidator).validarFunkoUpdateDto(updateDto);
+        when(repository.findById(1L)).thenReturn(Optional.empty());
 
         FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.update(1L, updateDto));
         assertEquals("Funko con id 1 no encontrado", e.getMessage());
 
-        verify(validador).validarFunkoUpdateDto(updateDto);
+        verify(funkoValidator).validarFunkoUpdateDto(updateDto);
         verify(repository).findById(1L);
         verify(mapper, never()).fromUpdateToEntity(any(), any());
-        verify(repository, never()).update(anyLong(), any());
+        verify(repository, never()).save(any());
     }
 
     @Test
     void deleteById() {
-        when(repository.deleteById(1L)).thenReturn(funko);
+        when(repository.existsById(1L)).thenReturn(true);
+        doNothing().when(repository).deleteById(1L);
 
         service.deleteById(1L);
 
-        verify(repository).deleteById(1L);
+        verify(repository, times(1)).existsById(1L);
+        verify(repository, times(1)).deleteById(1L);
     }
 
     @Test
     void deleteByIdNotFound() {
-        when(repository.deleteById(1L)).thenReturn(null);
+        when(repository.existsById(1L)).thenReturn(false);
 
         FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.deleteById(1L));
         assertEquals("Funko con id 1 no encontrado", e.getMessage());
 
-        verify(repository).deleteById(1L);
+        verify(repository, times(1)).existsById(1L);
+    }
+
+    @Test
+    void deleteLogically() {
+        when(repository.findById(1L)).thenReturn(Optional.of(funko));
+        when(repository.save(funko)).thenReturn(funko);
+
+        service.deleteLogically(1L);
+
+        assertAll(
+                () -> assertTrue(funko.isBorrado())
+        );
+
+        verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).save(funko);
+    }
+
+    @Test
+    void deleteLogicallyFunkoNotFound() throws FunkoException {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.deleteLogically(1L));
+        assertEquals("Funko con id 1 no encontrado", e.getMessage());
+
+        verify(repository, times(1)).findById(1L);
+        verify(repository, never()).save(any());
     }
 }

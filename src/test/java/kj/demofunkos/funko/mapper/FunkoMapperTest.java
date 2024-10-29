@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FunkoMapperTest {
     FunkoMapper mapper;
 
-    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, LocalDateTime.now(), LocalDateTime.now());
+    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, LocalDateTime.now(), LocalDateTime.now(), false);
 
     @BeforeEach
     void setUp(){
@@ -37,11 +37,12 @@ class FunkoMapperTest {
         Funko funko = mapper.fromCreatetoEntity(dto);
 
         assertAll(
+                ()-> assertNull(funko.getId()),
                 ()-> assertEquals(dto.getNombre(), funko.getNombre()),
                 ()-> assertEquals(dto.getPrecio(), funko.getPrecio()),
-                ()-> assertNotNull(funko.getId()),
                 ()-> assertNotNull(funko.getFechaAlta()),
-                ()-> assertNotNull(funko.getFechaModificacion())
+                ()-> assertNotNull(funko.getFechaModificacion()),
+                ()-> assertFalse(funko.isBorrado())
         );
     }
 
@@ -56,7 +57,7 @@ class FunkoMapperTest {
                 ()-> assertEquals(dto.getNombre(), funkoUpdated.getNombre()),
                 ()-> assertEquals(funkoViejo.getPrecio(), funkoUpdated.getPrecio()),
                 ()-> assertEquals(funkoViejo.getFechaAlta(), funkoUpdated.getFechaAlta()),
-                ()-> assertNotEquals(funkoViejo.getFechaModificacion(), funkoUpdated.getFechaModificacion())
+                ()-> assertFalse(funkoUpdated.isBorrado())
         );
 
     }

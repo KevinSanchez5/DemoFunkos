@@ -1,100 +1,148 @@
 package kj.demofunkos.funko.repository;
 
-import kj.demofunkos.funko.exceptions.FunkoException;
 import kj.demofunkos.funko.model.Funko;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DataJpaTest
 class FunkoRepositoryTest {
 
-    FunkoRepository repository ;
+    Funko funkoTest = new Funko(null, "Funko Test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false);
+    Funko funkoUpdate = new Funko("Funko Update", 2.0);
+
+    @Autowired
+    private FunkoRepository funkoRepository;
+
+    @Autowired
+    private TestEntityManager entityManager;
 
     @BeforeEach
     void setUp() {
-        repository = new FunkoRepository();
+        entityManager.merge(funkoTest);
+        entityManager.flush();
     }
 
+
     @Test
-    void findAll() {
-        List<Funko> funkos = repository.findAll();
+    void findByNombreIgnoreCase() {
+        Optional<Funko> funko = funkoRepository.findByNombreIgnoreCase("Funko TEST");
 
         assertAll(
-                () -> assertTrue(funkos.isEmpty()),
-                () -> assertEquals(0, funkos.size())
-         );
-    }
-
-    @Test
-    void findById() {
-        Funko funko = new Funko("Funko 1", 1.0);
-        Funko funkoGuardado =repository.save(funko);
-
-        Funko funkoEncontrado = repository.findById(funkoGuardado.getId());
-
-        assertNotNull(funkoEncontrado);
-
-        assertEquals(funkoGuardado.getId(), funkoEncontrado.getId());
-        assertEquals(funko.getNombre(), funkoEncontrado.getNombre());
-        assertEquals(funko.getPrecio(), funkoEncontrado.getPrecio());
-        assertEquals(funkoGuardado.getFechaModificacion(), funkoEncontrado.getFechaModificacion());
-        assertEquals(funkoGuardado.getFechaAlta(), funkoEncontrado.getFechaAlta());
-    }
-
-    @Test
-    void findByIdNotFound() throws FunkoException {
-
-        Funko funkoNotFound = repository.findById(1L);
-
-        assertNull(funkoNotFound);
-
-    }
-    @Test
-    void save() {
-        Funko funko = new Funko("test", 1.0);
-
-        Funko funkoSaved = repository.save(funko);
-        System.out.println(funkoSaved.getId());
-        assertAll(
-                () -> assertNotNull(funkoSaved.getId()),
-                () -> assertEquals(funko.getNombre(), funkoSaved.getNombre()),
-                () -> assertEquals(funko.getPrecio(), funkoSaved.getPrecio()),
-                () -> assertEquals(funko.getFechaAlta(), funkoSaved.getFechaAlta()),
-                () -> assertEquals(funko.getFechaModificacion() ,funkoSaved.getFechaModificacion())
+                () -> assertTrue(funko.isPresent()),
+                () -> assertEquals(funkoTest.getNombre(), funko.get().getNombre()),
+                () -> assertEquals(funkoTest.getPrecio(), funko.get().getPrecio()),
+                () -> assertEquals(funkoTest.getFechaAlta(), funko.get().getFechaAlta()),
+                () -> assertEquals(funkoTest.getFechaModificacion(), funko.get().getFechaModificacion()),
+                () -> assertFalse(funkoTest.isBorrado())
         );
     }
 
     @Test
-    void update() {
-        Funko funko = new Funko("test", 1.0);
-        Funko funkoSaved = repository.save(funko);
+    void findByNombreIgnoreCaseEmptyOptional() {
+        Optional<Funko> emptyFunko = funkoRepository.findByNombreIgnoreCase("funkoInvisible");
 
-        funko.setNombre("testUpdated");
-        funko.setPrecio(2.0);
+        assertTrue(emptyFunko.isEmpty());
+    }
 
-        Funko funkoUpdated = repository.update(funkoSaved.getId(), funko);
+
+    @Test
+    void findByPriceGreaterThan() {
+        List<Funko> funkosBaratos = funkoRepository.findByPriceGreaterThan(0.1);
 
         assertAll(
-                () -> assertEquals(funkoUpdated.getId(), funkoSaved.getId()),
-                () -> assertEquals(funkoUpdated.getNombre(), "testUpdated"),
-                () -> assertEquals(funkoUpdated.getPrecio(), 2.0),
-                () -> assertEquals(funkoUpdated.getFechaAlta(), funkoSaved.getFechaAlta()),
-                () -> assertEquals(funkoUpdated.getFechaModificacion(), funkoSaved.getFechaModificacion())
+                () -> assertFalse(funkosBaratos.isEmpty()),
+                () -> assertEquals(1, funkosBaratos.size()),
+                () -> assertEquals(funkoTest.getNombre(), funkosBaratos.getFirst().getNombre()),
+                () -> assertEquals(funkoTest.getPrecio(), funkosBaratos.getFirst().getPrecio()),
+                () -> assertEquals(funkoTest.getFechaAlta(), funkosBaratos.getFirst().getFechaAlta()),
+                () -> assertEquals(funkoTest.getFechaModificacion(), funkosBaratos.getFirst().getFechaModificacion()),
+                () -> assertFalse(funkosBaratos.getFirst().isBorrado()),
+                () -> assertTrue(funkosBaratos.getFirst().getPrecio() > 0.1)
         );
     }
 
     @Test
-    void deleteById() {
-        Funko funko = new Funko("test", 1.0);
-        Funko funkoSaved = repository.save(funko);
+    void findByPriceGreaterThanEmptyList() {
+        List<Funko> funkosCaros = funkoRepository.findByPriceGreaterThan(100.0);
 
-        repository.deleteById(funkoSaved.getId());
+        assertTrue(funkosCaros.isEmpty());
+    }
 
-        Funko funkoDeleted = repository.findById(funkoSaved.getId());
+    @Test
+    void findByPriceLessThan() {
+        List<Funko> funkosBaratos = funkoRepository.findByPriceLessThan(10.0);
 
-        assertNull(funkoDeleted);
+        assertAll(
+                () -> assertFalse(funkosBaratos.isEmpty()),
+                () -> assertEquals(1, funkosBaratos.size()),
+                () -> assertEquals(funkoTest.getNombre(), funkosBaratos.getFirst().getNombre()),
+                () -> assertEquals(funkoTest.getPrecio(), funkosBaratos.getFirst().getPrecio()),
+                () -> assertEquals(funkoTest.getFechaAlta(), funkosBaratos.getFirst().getFechaAlta()),
+                () -> assertEquals(funkoTest.getFechaModificacion(), funkosBaratos.getFirst().getFechaModificacion()),
+                () -> assertFalse(funkosBaratos.getFirst().isBorrado()),
+                () -> assertTrue(funkosBaratos.getFirst().getPrecio() < 10.0)
+        );
+    }
+
+    @Test
+    void findByPrecioBetweenEmptyList() {
+        List<Funko> funkosRegalados = funkoRepository.findByPriceLessThan(0.00);
+
+        assertTrue(funkosRegalados.isEmpty());
+    }
+
+    @Test
+    void findByNombreContainingIgnoreCase() {
+        List<Funko> funkos = funkoRepository.findByNombreContainingIgnoreCase("Test");
+
+        assertAll(
+                () -> assertFalse(funkos.isEmpty()),
+                () -> assertEquals(1, funkos.size()),
+                () -> assertEquals(funkoTest.getNombre(), funkos.getFirst().getNombre()),
+                () -> assertEquals(funkoTest.getPrecio(), funkos.getFirst().getPrecio()),
+                () -> assertEquals(funkoTest.getFechaAlta(), funkos.getFirst().getFechaAlta()),
+                () -> assertEquals(funkoTest.getFechaModificacion(), funkos.getFirst().getFechaModificacion()),
+                () -> assertFalse(funkoTest.isBorrado()),
+                () -> assertTrue(funkos.getFirst().getNombre().contains("Test"))
+        );
+    }
+
+    @Test
+    void findByNombreContainingIgnoreCaseEmptyList() {
+        List<Funko> funkos = funkoRepository.findByNombreContainingIgnoreCase("Invisible");
+
+        assertTrue(funkos.isEmpty());
+    }
+
+    @Test
+    void findByPrecioBetween() {
+        List<Funko> funkos = funkoRepository.findByPrecioBetween(0.0, 10.0);
+
+        assertAll(
+                () -> assertFalse(funkos.isEmpty()),
+                () -> assertEquals(1, funkos.size()),
+                () -> assertEquals(funkoTest.getNombre(), funkos.getFirst().getNombre()),
+                () -> assertEquals(funkoTest.getPrecio(), funkos.getFirst().getPrecio()),
+                () -> assertEquals(funkoTest.getFechaAlta(), funkos.getFirst().getFechaAlta()),
+                () -> assertEquals(funkoTest.getFechaModificacion(), funkos.getFirst().getFechaModificacion()),
+                () -> assertFalse(funkoTest.isBorrado()),
+                () -> assertTrue(funkos.getFirst().getPrecio() > 0.0 && funkos.getFirst().getPrecio() < 10.0)
+        );
+    }
+
+    @Test
+    void findByPrecioBetween_EmptyList() {
+        List<Funko> funkos = funkoRepository.findByPrecioBetween(100.0, 200.0);
+
+        assertTrue(funkos.isEmpty());
     }
 }

@@ -5,10 +5,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Objects;
-
 @Component
-public class Validador {
+public class FunkoValidator {
 
     public void validarFunkoUpdateDto(FunkoUpdateDto dto) {
         if (dto.getNombre() == null  && dto.getPrecio() == null) {

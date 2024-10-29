@@ -19,13 +19,14 @@ public class FunkoMapper {
     }
 
 
-    public Funko fromUpdateToEntity(Funko funkoViejo, FunkoUpdateDto funkoupdateDto) {
+    public Funko fromUpdateToEntity(Funko funkoViejo, FunkoUpdateDto funkoUpdateDto) {
         return new Funko(
                 funkoViejo.getId(),
-                funkoupdateDto.getNombre() != null ? funkoupdateDto.getNombre().trim() : funkoViejo.getNombre(),
-                funkoupdateDto.getPrecio() != null ? funkoupdateDto.getPrecio() : funkoViejo.getPrecio(),
+                funkoUpdateDto.getNombre() != null ? funkoUpdateDto.getNombre().trim() : funkoViejo.getNombre(),
+                funkoUpdateDto.getPrecio() != null ? funkoUpdateDto.getPrecio() : funkoViejo.getPrecio(),
                 funkoViejo.getFechaAlta(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                false
         );
     }
 }

@@ -6,7 +6,7 @@ import kj.demofunkos.funko.exceptions.FunkoNotFoundException;
 import kj.demofunkos.funko.mapper.FunkoMapper;
 import kj.demofunkos.funko.model.Funko;
 import kj.demofunkos.funko.repository.FunkoRepository;
-import kj.demofunkos.funko.validator.Validador;
+import kj.demofunkos.funko.validator.FunkoValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,7 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 @CacheConfig(cacheNames = {"funkos"})
@@ -23,13 +23,13 @@ public class FunkoService {
 
     private final FunkoRepository funkoRepository;
     private final FunkoMapper mapper;
-    private final Validador validador;
+    private final FunkoValidator funkoValidator;
 
     @Autowired
-    public FunkoService(FunkoRepository funkoRepository, FunkoMapper mapper, Validador validador) {
+    public FunkoService(FunkoRepository funkoRepository, FunkoMapper mapper, FunkoValidator funkoValidator) {
         this.mapper = mapper;
         this.funkoRepository = funkoRepository;
-        this.validador = validador;
+        this.funkoValidator = funkoValidator;
     }
 
     public List<Funko> findAll() {
@@ -41,38 +41,46 @@ public class FunkoService {
     @Cacheable(key = "#id")
     public Funko findById(Long id) {
 
-        Funko funko = funkoRepository.findById(id);
-        if (funko == null) {
+        Optional<Funko> funko = funkoRepository.findById(id);
+        if (funko.isEmpty()) {
             throw new FunkoNotFoundException(id.toString());
         }
-        return funko;
+        return funko.get();
     }
 
     @CachePut(key = "#result.id")
-    public Funko save(FunkoCreateDto funko) {
-        Funko funkoEntity = mapper.fromCreatetoEntity(funko);
+    public Funko save(FunkoCreateDto funkoDto) {
+        Funko funkoEntity = mapper.fromCreatetoEntity(funkoDto);
         return funkoRepository.save(funkoEntity);
     }
 
     @CachePut(key = "#result.id")
     public Funko update(Long id, FunkoUpdateDto dto) {
-        validador.validarFunkoUpdateDto(dto);
-        Funko funkoOptional = funkoRepository.findById(id);
-        if (funkoOptional == null ) {
+        funkoValidator.validarFunkoUpdateDto(dto);
+        Optional<Funko> funkoOptional = funkoRepository.findById(id);
+        if (funkoOptional.isEmpty()) {
             throw new FunkoNotFoundException(id.toString());
         }
-        Funko funkoEntity = mapper.fromUpdateToEntity(funkoOptional, dto);
-        return funkoRepository.update(id, funkoEntity);
+        Funko funkoEntity = mapper.fromUpdateToEntity(funkoOptional.get(), dto);
+        return funkoRepository.save(funkoEntity);
     }
 
     @CacheEvict(key = "#id")
     public void deleteById(Long id) {
-        Funko funko = funkoRepository.deleteById(id);
-        if (funko == null) {
+        boolean funko = funkoRepository.existsById(id);
+        if (!funko) {
             throw new FunkoNotFoundException(id.toString());
         }
+        funkoRepository.deleteById(id);
     }
 
-
-
+    @CacheEvict(key = "#id")
+    public void deleteLogically(Long id){
+        Optional<Funko> funko = funkoRepository.findById(id);
+        if (funko.isEmpty()) {
+            throw new FunkoNotFoundException(id.toString());
+        }
+        funko.get().setBorrado(true);
+        funkoRepository.save(funko.get());
+    }
 }

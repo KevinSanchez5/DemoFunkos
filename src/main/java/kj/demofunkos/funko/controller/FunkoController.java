@@ -50,6 +50,9 @@ public class FunkoController {
         return ResponseEntity.noContent().build();
     }
 
-
-
+    @DeleteMapping("/logicalDelete/{id}")
+    public ResponseEntity<Void> logicalDeleteById(@PathVariable Long id) {
+        funkoService.deleteLogically(id);
+        return ResponseEntity.noContent().build();
+    }
 }
