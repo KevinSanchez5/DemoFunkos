@@ -50,9 +50,24 @@ public class FunkoController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/logicalDelete/{id}")
+    @PatchMapping("{id}/desactivar")
     public ResponseEntity<Void> logicalDeleteById(@PathVariable Long id) {
         funkoService.deleteLogically(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Funko> reactivateFunko(@PathVariable Long id) {
+        return ResponseEntity.ok(funkoService.reactivateFunko(id));
+    }
+
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<Funko> findByNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(funkoService.findByNombreIgnoreCase(nombre));
+    }
+
+    @GetMapping("/precio-entre")
+    public ResponseEntity<List<Funko>> findByPrecioBetween(@RequestParam Double minimo, @RequestParam Double maximo) {
+        return ResponseEntity.ok(funkoService.findByPrecioBetween(minimo, maximo));
     }
 }

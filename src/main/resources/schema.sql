@@ -12,5 +12,9 @@ CREATE TABLE IF NOT EXISTS funkos (
     precio DECIMAL(10, 2) NOT NULL,
     fecha_alta TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
     fecha_modificacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-    borrado BOOLEAN NOT NULL DEFAULT FALSE
+    borrado BOOLEAN NOT NULL DEFAULT FALSE,
+    descripcion VARCHAR(255),
+    fecha_de_fabricacion DATE,
+    categoria_id UUID,
+    FOREIGN KEY (categoria_id) REFERENCES categorias(id) ON DELETE SET NULL
 );

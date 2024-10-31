@@ -4,6 +4,8 @@ import kj.demofunkos.categoria.dto.CategoriaCreateDto;
 import kj.demofunkos.categoria.models.Categoria;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 @Component
 public class CategoriaMapper {
 
@@ -16,8 +18,9 @@ public class CategoriaMapper {
                 categoriaVieja.getId(),
                 dto.getNombre() != null ? dto.getNombre().trim().toUpperCase() : categoriaVieja.getNombre(),
                 categoriaVieja.getFechaAlta(),
-                categoriaVieja.getFechaModificacion(),
-                categoriaVieja.isActiva()
+                LocalDateTime.now(),
+                categoriaVieja.isActiva(),
+                null
         );
     }
 }

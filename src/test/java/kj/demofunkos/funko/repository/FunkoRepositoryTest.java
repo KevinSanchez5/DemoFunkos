@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 class FunkoRepositoryTest {
 
-    Funko funkoTest = new Funko(null, "Funko Test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false);
+    Funko funkoTest = new Funko(null, "Funko Test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null);
     Funko funkoUpdate = new Funko("Funko Update", 2.0);
 
     @Autowired
@@ -55,8 +55,8 @@ class FunkoRepositoryTest {
 
 
     @Test
-    void findByPriceGreaterThan() {
-        List<Funko> funkosBaratos = funkoRepository.findByPriceGreaterThan(0.1);
+    void findByPrecioGreaterThan() {
+        List<Funko> funkosBaratos = funkoRepository.findByPrecioGreaterThan(0.1);
 
         assertAll(
                 () -> assertFalse(funkosBaratos.isEmpty()),
@@ -71,15 +71,15 @@ class FunkoRepositoryTest {
     }
 
     @Test
-    void findByPriceGreaterThanEmptyList() {
-        List<Funko> funkosCaros = funkoRepository.findByPriceGreaterThan(100.0);
+    void findByPrecioGreaterThanEmptyList() {
+        List<Funko> funkosCaros = funkoRepository.findByPrecioGreaterThan(100.0);
 
         assertTrue(funkosCaros.isEmpty());
     }
 
     @Test
-    void findByPriceLessThan() {
-        List<Funko> funkosBaratos = funkoRepository.findByPriceLessThan(10.0);
+    void findByPrecioLessThan() {
+        List<Funko> funkosBaratos = funkoRepository.findByPrecioLessThan(10.0);
 
         assertAll(
                 () -> assertFalse(funkosBaratos.isEmpty()),
@@ -95,7 +95,7 @@ class FunkoRepositoryTest {
 
     @Test
     void findByPrecioBetweenEmptyList() {
-        List<Funko> funkosRegalados = funkoRepository.findByPriceLessThan(0.00);
+        List<Funko> funkosRegalados = funkoRepository.findByPrecioLessThan(0.00);
 
         assertTrue(funkosRegalados.isEmpty());
     }

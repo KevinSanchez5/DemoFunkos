@@ -15,10 +15,10 @@ public interface FunkoRepository extends JpaRepository<Funko, Long> {
     Optional<Funko> findByNombreIgnoreCase(String nombre);
 
     @Query("SELECT f FROM Funko f WHERE f.precio > ?1")
-    List<Funko> findByPriceGreaterThan(Double price);
+    List<Funko> findByPrecioGreaterThan(Double price);
 
     @Query("SELECT f FROM Funko f WHERE f.precio < ?1")
-    List<Funko> findByPriceLessThan(Double price);
+    List<Funko> findByPrecioLessThan(Double price);
 
     @Query("SELECT f FROM Funko f WHERE upper(f.nombre) LIKE concat('%', upper(?1), '%') ")
     List<Funko> findByNombreContainingIgnoreCase(String nombre);

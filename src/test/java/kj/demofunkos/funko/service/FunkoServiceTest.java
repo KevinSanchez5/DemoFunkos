@@ -24,8 +24,8 @@ import static org.mockito.Mockito.*;
 class FunkoServiceTest {
 
     Funko funko = new Funko("FunkoTest", 10.0);
-    FunkoCreateDto createDto = new FunkoCreateDto("FunkoTest", 10.0);
-    FunkoUpdateDto updateDto = new FunkoUpdateDto("FunkoTest", null);
+    FunkoCreateDto createDto = new FunkoCreateDto("FunkoTest", 10.0, null, null);
+    FunkoUpdateDto updateDto = new FunkoUpdateDto("FunkoTest", null, null, null);
 
     @Mock
     private FunkoRepository repository;
@@ -178,5 +178,135 @@ class FunkoServiceTest {
 
         verify(repository, times(1)).findById(1L);
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    void findByNombreIgnoreCase() throws FunkoException{
+        when(repository.findByNombreIgnoreCase("FUNKOTEST")).thenReturn(Optional.of(funko));
+
+        Funko funkoBuscado = service.findByNombreIgnoreCase("FUNKOTEST");
+
+        assertAll(
+                ()-> assertEquals(funko.getNombre(), funkoBuscado.getNombre()),
+                ()-> assertFalse(funkoBuscado.isBorrado()),
+                ()-> assertEquals(funko.getPrecio(), funkoBuscado.getPrecio()),
+                ()-> assertEquals(funko.getFechaAlta(), funkoBuscado.getFechaAlta()),
+                ()-> assertEquals(funko.getFechaModificacion(), funkoBuscado.getFechaModificacion())
+        );
+        verify(repository, times(1)).findByNombreIgnoreCase("FUNKOTEST");
+    }
+
+    @Test
+    void findByNombreIgnoreCaseNotFound() throws FunkoException {
+        when(repository.findByNombreIgnoreCase("ALGO")).thenReturn(Optional.empty());
+
+        FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.findByNombreIgnoreCase("ALGO"));
+
+        assertAll(
+                ()-> assertEquals("Funko con nombre ALGO no encontrado", e.getMessage())
+        );
+
+        verify(repository, times(1)).findByNombreIgnoreCase(any());
+    }
+
+    @Test
+    void findByPrecioGreaterThan() throws FunkoException {
+        when(repository.findByPrecioGreaterThan(0.0)).thenReturn(List.of(funko));
+
+        List<Funko> funkosEncontrados = service.findByPrecioGreaterThan(0.0);
+
+        assertAll(
+                () -> assertFalse(funkosEncontrados.isEmpty()),
+                () -> assertEquals(funko.getNombre(), funkosEncontrados.get(0).getNombre()),
+                () -> assertFalse(funkosEncontrados.get(0).isBorrado()),
+                () -> assertEquals(1, funkosEncontrados.size())
+        );
+    }
+
+    @Test
+    void findByPrecioGreaterThanEmptyList() throws FunkoException {
+        when(repository.findByPrecioGreaterThan(1000.0)).thenReturn(List.of());
+
+        List<Funko> funkosEncontrados = service.findByPrecioGreaterThan(1000.0);
+
+        assertAll(
+                () -> assertTrue(funkosEncontrados.isEmpty())
+        );
+    }
+
+    @Test
+    void findFunkosByPrecioLessThan() throws FunkoException {
+        when(repository.findByPrecioLessThan(1000.0)).thenReturn(List.of(funko));
+
+        List<Funko> funkosEncontrados = service.findByPrecioLessThan(1000.0);
+
+        assertAll(
+                () -> assertFalse(funkosEncontrados.isEmpty()),
+                () -> assertEquals(funko.getNombre(), funkosEncontrados.get(0).getNombre()),
+                () -> assertFalse(funkosEncontrados.get(0).isBorrado()),
+                () -> assertEquals(1, funkosEncontrados.size())
+        );
+    }
+
+    @Test
+    void findFunkosByPrecioLessThanEmptyList() throws FunkoException {
+        when(repository.findByPrecioLessThan(0.0)).thenReturn(List.of());
+
+        List<Funko> funkosEncontrados = service.findByPrecioLessThan(0.0);
+
+        assertAll(
+                () -> assertTrue(funkosEncontrados.isEmpty())
+        );
+    }
+
+    @Test
+    void findByNombreContainingIgnoreCase() throws FunkoException {
+        when(repository.findByNombreContainingIgnoreCase("fun")).thenReturn(List.of(funko));
+
+        List<Funko> funkosEncontrados = service.findByNombreContainingIgnoreCase("fun");
+
+        assertAll(
+                () -> assertFalse(funkosEncontrados.isEmpty()),
+                () -> assertEquals(funko.getNombre(), funkosEncontrados.get(0).getNombre()),
+                () -> assertFalse(funkosEncontrados.get(0).isBorrado()),
+                () -> assertEquals(1, funkosEncontrados.size()),
+                () -> assertTrue(funkosEncontrados.get(0).getNombre().toLowerCase().contains("fun"))
+        );
+    }
+
+    @Test
+    void findByNombreContainingIgnoreCaseEmptyList() throws FunkoException {
+        when(repository.findByNombreContainingIgnoreCase("algo")).thenReturn(List.of());
+
+        List<Funko> funkosEncontrados = service.findByNombreContainingIgnoreCase("algo");
+
+        assertAll(
+                () -> assertTrue(funkosEncontrados.isEmpty())
+        );
+    }
+
+    @Test
+    void findFunkosByPrecioBetween() throws FunkoException {
+        when(repository.findByPrecioBetween(0.0, 10.0)).thenReturn(List.of(funko));
+
+        List<Funko> funkosEncontrados = service.findByPrecioBetween(0.0, 10.0);
+
+        assertAll(
+                () -> assertFalse(funkosEncontrados.isEmpty()),
+                () -> assertEquals(funko.getNombre(), funkosEncontrados.get(0).getNombre()),
+                () -> assertFalse(funkosEncontrados.get(0).isBorrado()),
+                () -> assertEquals(1, funkosEncontrados.size())
+        );
+    }
+
+    @Test
+    void findFunkosByPrecioBetweenEmptyList() throws FunkoException {
+        when(repository.findByPrecioBetween(10.0, 20.0)).thenReturn(List.of());
+
+        List<Funko> funkosEncontrados = service.findByPrecioBetween(10.0, 20.0);
+
+        assertAll(
+                () -> assertTrue(funkosEncontrados.isEmpty())
+        );
     }
 }

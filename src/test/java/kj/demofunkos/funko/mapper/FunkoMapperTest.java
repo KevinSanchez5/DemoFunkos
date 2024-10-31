@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FunkoMapperTest {
     FunkoMapper mapper;
 
-    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, LocalDateTime.now(), LocalDateTime.now(), false);
+    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, LocalDateTime.now(), LocalDateTime.now(), false , null);
 
     @BeforeEach
     void setUp(){
@@ -33,7 +33,7 @@ class FunkoMapperTest {
 
     @Test
     void fromCreatetoEntity() {
-        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0);
+        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, null, null);
         Funko funko = mapper.fromCreatetoEntity(dto);
 
         assertAll(
@@ -49,7 +49,7 @@ class FunkoMapperTest {
     @Test
     void fromUpdateToEntity() {
 
-        FunkoUpdateDto dto = new FunkoUpdateDto("testNuevo", null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("testNuevo", null, null, null);
         Funko funkoUpdated = mapper.fromUpdateToEntity(funkoViejo, dto);
 
         assertAll(

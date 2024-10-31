@@ -42,7 +42,7 @@ public class CategoriaService {
         Optional<Categoria> categoria = categoriaRepository.findById(id);
 
         if (categoria.isEmpty()){
-            throw new CategoriaNotFoundException(id.toString());
+            throw new CategoriaNotFoundException(id);
         }
         return categoria.get();
     }
@@ -51,7 +51,7 @@ public class CategoriaService {
     public Categoria save(CategoriaCreateDto dto){
         String nombre = dto.getNombre().trim().toUpperCase();
         if(categoriaRepository.existsByNombre(nombre)){
-            throw new CategoriaBadRequestException("La categoria ya existe");
+            throw new CategoriaBadRequestException(nombre);
         }
         Categoria categoria = mapper.fromDtoToEntity(dto);
         return categoriaRepository.save(categoria);
@@ -62,9 +62,9 @@ public class CategoriaService {
         String nombre = dto.getNombre().trim().toUpperCase();
         Optional<Categoria> optionalCategoria = categoriaRepository.findById(id);
         if (categoriaRepository.existsByNombre(nombre)){
-            throw new CategoriaBadRequestException("La categoria ya existe");
+            throw new CategoriaBadRequestException(nombre);
         }else if(optionalCategoria.isEmpty()){
-            throw new CategoriaNotFoundException(id.toString());
+            throw new CategoriaNotFoundException(id);
         }
         Categoria categoriaVieja = optionalCategoria.get();
         Categoria categoriaNueva = mapper.updateCategoriaFromDtoToEntity(dto, categoriaVieja);
@@ -75,18 +75,41 @@ public class CategoriaService {
     public void deactivateCategoria(UUID id){
         Optional<Categoria> categoria = categoriaRepository.findById(id);
         if (categoria.isEmpty()){
-            throw new FunkoNotFoundException(id.toString());
+            throw new CategoriaNotFoundException(id.toString());
         }
         categoria.get().setActiva(false);
         categoriaRepository.save(categoria.get());
+    }
+
+    @Cacheable(key = "#id")
+    public Categoria reactivateCategoria(UUID id){
+        Optional<Categoria> categoria = categoriaRepository.findById(id);
+        if (categoria.isEmpty()){
+            throw new CategoriaNotFoundException(id.toString());
+        }
+        categoria.get().setActiva(true);
+        return categoriaRepository.save(categoria.get());
     }
 
     @CacheEvict(key = "#id")
     public void deleteById(UUID id){
         boolean categoria = categoriaRepository.existsById(id);
         if (!categoria){
-            throw new CategoriaNotFoundException(id.toString());
+            throw new CategoriaNotFoundException(id);
         }
         categoriaRepository.deleteById(id);
     }
+
+    @Cacheable(key = "#id")
+    public Categoria findByNombre(String nombre) {
+        String nombreFiltrado = nombre.trim().toUpperCase();
+        Optional<Categoria> categoria = categoriaRepository.findByNombre(nombreFiltrado);
+
+        if (categoria.isEmpty()){
+            throw new CategoriaNotFoundException(nombreFiltrado);
+        }
+        return categoria.get();
+    }
+
+
 }

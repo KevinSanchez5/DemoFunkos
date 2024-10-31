@@ -43,17 +43,26 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.update(id, categoria));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
+    @PatchMapping("/{id}/desactivar")
+    public ResponseEntity<Void> deactivateCategoria(@PathVariable UUID id) {
         categoriaService.deactivateCategoria(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Categoria> reactivateCategoria(@PathVariable UUID id) {
+        return ResponseEntity.ok(categoriaService.reactivateCategoria(id));
+    }
 
-    //Metodo deshabilitado temporalmente
-//    @DeleteMapping("/realDelete/{id}")
-//    public ResponseEntity<Void> realDeleteById(@PathVariable UUID id) {
-//        categoriaService.deleteById(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<Categoria> findByNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(categoriaService.findByNombre(nombre));
+    }
+
+    //Pensando en desactivar
+    @DeleteMapping("/realDelete/{id}")
+    public ResponseEntity<Void> realDeleteById(@PathVariable UUID id) {
+        categoriaService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

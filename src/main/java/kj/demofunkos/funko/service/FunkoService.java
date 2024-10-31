@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +34,9 @@ public class FunkoService {
     }
 
     public List<Funko> findAll() {
-         List<Funko> list;
-            list = funkoRepository.findAll();
-            return list;
+        List<Funko> list;
+        list = funkoRepository.findAll();
+        return list;
     }
 
     @Cacheable(key = "#id")
@@ -43,7 +44,7 @@ public class FunkoService {
 
         Optional<Funko> funko = funkoRepository.findById(id);
         if (funko.isEmpty()) {
-            throw new FunkoNotFoundException(id.toString());
+            throw new FunkoNotFoundException(id);
         }
         return funko.get();
     }
@@ -59,7 +60,7 @@ public class FunkoService {
         funkoValidator.validarFunkoUpdateDto(dto);
         Optional<Funko> funkoOptional = funkoRepository.findById(id);
         if (funkoOptional.isEmpty()) {
-            throw new FunkoNotFoundException(id.toString());
+            throw new FunkoNotFoundException(id);
         }
         Funko funkoEntity = mapper.fromUpdateToEntity(funkoOptional.get(), dto);
         return funkoRepository.save(funkoEntity);
@@ -69,18 +70,62 @@ public class FunkoService {
     public void deleteById(Long id) {
         boolean funko = funkoRepository.existsById(id);
         if (!funko) {
-            throw new FunkoNotFoundException(id.toString());
+            throw new FunkoNotFoundException(id);
         }
         funkoRepository.deleteById(id);
     }
 
     @CacheEvict(key = "#id")
-    public void deleteLogically(Long id){
+    public void deleteLogically(Long id) {
         Optional<Funko> funko = funkoRepository.findById(id);
         if (funko.isEmpty()) {
-            throw new FunkoNotFoundException(id.toString());
+            throw new FunkoNotFoundException(id);
         }
         funko.get().setBorrado(true);
         funkoRepository.save(funko.get());
+    }
+
+    @Cacheable(key = "#id")
+    public Funko reactivateFunko(Long id) {
+        Optional<Funko> funko = funkoRepository.findById(id);
+        if (funko.isEmpty()) {
+            throw new FunkoNotFoundException(id);
+        }
+        funko.get().setBorrado(false);
+        return funkoRepository.save(funko.get());
+    }
+
+
+    //BUSQUEDAS EXTRA
+
+    @Cacheable
+    public Funko findByNombreIgnoreCase(String nombre) {
+        String nombreFiltrado = nombre.trim();
+        Optional<Funko> funkito = funkoRepository.findByNombreIgnoreCase(nombreFiltrado);
+        if (funkito.isEmpty()) {
+            throw new FunkoNotFoundException(nombre);
+        }
+        return funkito.get();
+    }
+
+    public List<Funko> findByPrecioGreaterThan(Double precio) {
+        List<Funko> funkosCaros;
+        funkosCaros = funkoRepository.findByPrecioGreaterThan(precio);
+        return funkosCaros;
+    }
+
+    public List<Funko> findByPrecioLessThan(Double precio) {
+        List<Funko> funkosBaratos;
+        funkosBaratos = funkoRepository.findByPrecioLessThan(precio);
+        return funkosBaratos;
+    }
+
+    public List<Funko> findByNombreContainingIgnoreCase(String nombre){
+        String nombreFiltrado = nombre.trim();
+        return funkoRepository.findByNombreContainingIgnoreCase(nombreFiltrado);
+    }
+
+    public List<Funko> findByPrecioBetween(Double precioMinimo, Double precioMaximo){
+        return funkoRepository.findByPrecioBetween(precioMinimo, precioMaximo);
     }
 }

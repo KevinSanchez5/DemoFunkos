@@ -1,8 +1,10 @@
 package kj.demofunkos.funko.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import kj.demofunkos.categoria.models.Categoria;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +42,11 @@ public class Funko {
     @Embedded
     private Detalles detalles;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "categoria_id")
+    @JsonIgnoreProperties("funkos")
+    private Categoria categoria;
+
     public Funko() {}
 
     public Funko(String nombre, Double precio) {
@@ -49,5 +56,6 @@ public class Funko {
         this.fechaAlta = LocalDateTime.now();
         this.fechaModificacion = LocalDateTime.now();
         this.borrado = false;
+        this.detalles = new Detalles();
     }
 }

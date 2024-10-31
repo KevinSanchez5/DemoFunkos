@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class FunkoControllerTest {
-    Funko funko = new Funko(1L, "test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false);
+    Funko funko = new Funko(1L, "test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null);
 
     ObjectMapper mapper = new ObjectMapper();
     @MockBean
@@ -112,7 +112,7 @@ class FunkoControllerTest {
     @Test
     @Order(4)
     void findByIdNotFound() throws Exception {
-        when(funkoService.findById(1L)).thenThrow(new FunkoNotFoundException(funko.getId().toString()));
+        when(funkoService.findById(1L)).thenThrow(new FunkoNotFoundException(funko.getId()));
         MockHttpServletResponse response = mockMvc.perform(
                 get(endpoint + "/1").accept(MediaType.APPLICATION_JSON)
         ).andReturn().getResponse();
@@ -127,7 +127,7 @@ class FunkoControllerTest {
     @Test
     @Order(5)
     void save() throws Exception{
-        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0);
+        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, null, null);
         when(funkoService.save(dto)).thenReturn(funko);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -151,7 +151,7 @@ class FunkoControllerTest {
     @Test
     @Order(6)
     void saveBadRequest() throws Exception {
-        FunkoCreateDto dto = new FunkoCreateDto("", 1.0);
+        FunkoCreateDto dto = new FunkoCreateDto("", 1.0, null, null);
         MockHttpServletResponse response = mockMvc.perform(
                 org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(endpoint)
                         .accept(MediaType.APPLICATION_JSON)
@@ -170,7 +170,7 @@ class FunkoControllerTest {
     @Test
     @Order(7)
     void update() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0);
+        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0 , null , null);
         when(funkoService.update(1L, dto)).thenReturn(funko);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -194,8 +194,8 @@ class FunkoControllerTest {
     @Test
     @Order(8)
     void updateNotFound() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0);
-        when(funkoService.update(1L, dto)).thenThrow(new FunkoNotFoundException(funko.getId().toString()));
+        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0, null, null);
+        when(funkoService.update(1L, dto)).thenThrow(new FunkoNotFoundException(funko.getId()));
 
         MockHttpServletResponse response = mockMvc.perform(
                 org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put(endpoint + "/1")
@@ -215,7 +215,7 @@ class FunkoControllerTest {
     @Test
     @Order(9)
     void updateBadRequest() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto ("deberiaestarmal",-2.0);
+        FunkoUpdateDto dto = new FunkoUpdateDto ("deberiaestarmal", -2.0, null, null);
         when(funkoService.update(1L, dto)).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio no puede ser menor o igual a 0"));
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -253,7 +253,7 @@ class FunkoControllerTest {
     @Test
     @Order(11)
     void deleteByIdNotFound() throws Exception {
-        doThrow(new FunkoNotFoundException(funko.getId().toString())).when(funkoService).deleteById(1L);
+        doThrow(new FunkoNotFoundException(funko.getId())).when(funkoService).deleteById(1L);
         MockHttpServletResponse response = mockMvc.perform(
                 org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete(endpoint + "/1")
                         .accept(MediaType.APPLICATION_JSON)
@@ -289,7 +289,7 @@ class FunkoControllerTest {
     @Test
     @Order(13)
     void logicalDeleteByIdNotFound() throws Exception {
-        doThrow(new FunkoNotFoundException(funko.getId().toString())).when(funkoService).deleteLogically(1L);
+        doThrow(new FunkoNotFoundException(funko.getId())).when(funkoService).deleteLogically(1L);
         MockHttpServletResponse response = mockMvc.perform(
                 org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete(endpoint + "/logicalDelete/1")
                        .accept(MediaType.APPLICATION_JSON)
