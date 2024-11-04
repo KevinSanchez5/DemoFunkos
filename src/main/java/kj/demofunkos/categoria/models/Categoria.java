@@ -14,7 +14,6 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "categorias")
 public class Categoria {
@@ -49,4 +48,5 @@ public class Categoria {
     }
 
     public Categoria() {}
+
 }

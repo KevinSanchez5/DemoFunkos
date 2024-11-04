@@ -20,7 +20,7 @@ public class CategoriaMapper {
                 categoriaVieja.getFechaAlta(),
                 LocalDateTime.now(),
                 categoriaVieja.isActiva(),
-                null
+                categoriaVieja.getFunkos()
         );
     }
 }

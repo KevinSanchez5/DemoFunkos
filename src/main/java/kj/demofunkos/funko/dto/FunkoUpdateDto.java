@@ -17,16 +17,19 @@ public class FunkoUpdateDto {
 
     private String descripcion;
 
+    private String nombreCategoria;
+
     @PastOrPresent(message = "La fecha de fabricación no puede ser futura")
     private LocalDate fechaDeFabricacion;
 
     public FunkoUpdateDto() {}
 
 
-    public FunkoUpdateDto(String nombre, Double precio, String descripcion, LocalDate fechaDeFabricacion) {
+    public FunkoUpdateDto(String nombre, Double precio, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
         this.fechaDeFabricacion = fechaDeFabricacion;
+        this.nombreCategoria = nombreCategoria;
     }
 }

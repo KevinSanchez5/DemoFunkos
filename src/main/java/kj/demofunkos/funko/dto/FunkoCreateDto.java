@@ -8,7 +8,6 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-@Builder
 public class FunkoCreateDto {
 
     @NotBlank(message = "El nombre no puede estar en blanco")
@@ -22,14 +21,20 @@ public class FunkoCreateDto {
 
     private String descripcion;
 
+    @NotNull(message = "El nombre de la categoria debe ingresarse")
+    @NotEmpty(message = "El nombre de la categoria no puede estar vacio")
+    @NotBlank(message = "El nombre de la categoria no puede estar en blanco")
+    private String nombreCategoria;
+
     @PastOrPresent(message = "La fecha de fabricación no puede ser futura")
     private LocalDate fechaDeFabricacion;
 
 
-    public FunkoCreateDto(String name, Double price, String descripcion, LocalDate fechaDeFabricacion) {
+    public FunkoCreateDto(String name, Double price, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {
         this.nombre = name;
         this.precio = price;
         this.descripcion = descripcion;
         this.fechaDeFabricacion = fechaDeFabricacion;
+        this.nombreCategoria = nombreCategoria;
     }
 }

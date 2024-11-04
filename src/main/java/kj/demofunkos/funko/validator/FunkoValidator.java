@@ -13,7 +13,7 @@ public class FunkoValidator {
         //regex para que la fecha tenga formato aaaa-mm-dd
         String regex = "\\d{4}-\\d{2}-\\d{2}";
 
-        if (dto.getNombre() == null && dto.getPrecio() == null && dto.getDescripcion() == null && dto.getFechaDeFabricacion() == null) {
+        if (dto.getNombre() == null && dto.getPrecio() == null && dto.getDescripcion() == null && dto.getFechaDeFabricacion() == null && dto.getNombreCategoria() == null) {
             throw new FunkoBadRequestException("El nombre y el precio no pueden estar vacíos");
         }
         if (dto.getPrecio() != null && dto.getPrecio() <= 0) {
@@ -29,6 +29,9 @@ public class FunkoValidator {
             {
                 throw new FunkoBadRequestException("La fecha de fabricación no tiene el formato aaaa-mm-dd");
             }
+        }
+        if (dto.getNombreCategoria() != null && dto.getNombreCategoria().trim().equals("")) {
+            throw new FunkoBadRequestException("El nombre de la categoria no puede estar vacio o ser espacios en blanco");
         }
     }
 }

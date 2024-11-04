@@ -1,5 +1,6 @@
 package kj.demofunkos.funko.mapper;
 
+import kj.demofunkos.categoria.models.Categoria;
 import kj.demofunkos.funko.dto.FunkoCreateDto;
 import kj.demofunkos.funko.dto.FunkoUpdateDto;
 import kj.demofunkos.funko.model.Detalles;
@@ -14,12 +15,12 @@ public class FunkoMapper {
     public FunkoCreateDto fromEntitytoCreateDto(Funko funko) {
         return new FunkoCreateDto(funko.getNombre(), funko.getPrecio(),
                 funko.getDetalles().getDescripcion()
-                , funko.getDetalles().getFechaDeFabricacion());
+                , funko.getDetalles().getFechaDeFabricacion(), funko.getCategoria().getNombre());
     }
 
-    public Funko fromCreatetoEntity(FunkoCreateDto funkoCreateDto) {
+    public Funko fromCreatetoEntity(FunkoCreateDto funkoCreateDto, Categoria categoria) {
 
-        Funko nuevoFunko = new Funko(funkoCreateDto.getNombre().trim(), funkoCreateDto.getPrecio());
+        Funko nuevoFunko = new Funko(funkoCreateDto.getNombre().trim(), funkoCreateDto.getPrecio(), categoria);
 
         nuevoFunko.setDetalles(new Detalles(
                 funkoCreateDto.getDescripcion() != null ? funkoCreateDto.getDescripcion().trim() : null,
@@ -30,7 +31,7 @@ public class FunkoMapper {
     }
 
 
-    public Funko fromUpdateToEntity(Funko funkoViejo, FunkoUpdateDto funkoUpdateDto) {
+    public Funko fromUpdateToEntity(Funko funkoViejo, FunkoUpdateDto funkoUpdateDto, Categoria categoriaNueva) {
         Detalles nuevosDetalles = new Detalles(
                 funkoUpdateDto.getDescripcion() != null ? funkoUpdateDto.getDescripcion().trim() : funkoViejo.getDetalles() != null ? funkoViejo.getDetalles().getDescripcion() : null,
                 funkoUpdateDto.getFechaDeFabricacion() != null ? funkoUpdateDto.getFechaDeFabricacion() : funkoViejo.getDetalles() != null ? funkoViejo.getDetalles().getFechaDeFabricacion() : null
@@ -43,8 +44,7 @@ public class FunkoMapper {
                 LocalDateTime.now(),
                 false,
                 nuevosDetalles,
-                //cambiar
-                funkoViejo.getCategoria()
+                categoriaNueva
         );
     }
 }

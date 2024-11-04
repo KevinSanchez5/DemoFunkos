@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 class FunkoRepositoryTest {
 
-    Funko funkoTest = new Funko(null, "Funko Test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null);
-    Funko funkoUpdate = new Funko("Funko Update", 2.0);
+    Funko funkoTest = new Funko(null, "Funko Test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null, null);
+    Funko funkoUpdate = new Funko("Funko Update", 2.0, null);
 
     @Autowired
     private FunkoRepository funkoRepository;

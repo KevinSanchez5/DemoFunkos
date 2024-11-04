@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "funkos")
 public class Funko {
@@ -42,14 +41,14 @@ public class Funko {
     @Embedded
     private Detalles detalles;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "categoria_id")
     @JsonIgnoreProperties("funkos")
     private Categoria categoria;
 
     public Funko() {}
 
-    public Funko(String nombre, Double precio) {
+    public Funko(String nombre, Double precio, Categoria categoria) {
         this.id = null;
         this.nombre = nombre;
         this.precio = precio;
@@ -57,5 +56,6 @@ public class Funko {
         this.fechaModificacion = LocalDateTime.now();
         this.borrado = false;
         this.detalles = new Detalles();
+        this.categoria = categoria;
     }
 }

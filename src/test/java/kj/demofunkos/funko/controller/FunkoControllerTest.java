@@ -18,6 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.server.ResponseStatusException;
@@ -33,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class FunkoControllerTest {
-    Funko funko = new Funko(1L, "test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null);
+    Funko funko = new Funko(1L, "test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null, null);
 
     ObjectMapper mapper = new ObjectMapper();
     @MockBean
@@ -127,7 +128,7 @@ class FunkoControllerTest {
     @Test
     @Order(5)
     void save() throws Exception{
-        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, null, null);
+        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, null, null, "algo");
         when(funkoService.save(dto)).thenReturn(funko);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -151,7 +152,7 @@ class FunkoControllerTest {
     @Test
     @Order(6)
     void saveBadRequest() throws Exception {
-        FunkoCreateDto dto = new FunkoCreateDto("", 1.0, null, null);
+        FunkoCreateDto dto = new FunkoCreateDto("", 1.0, null, null, null);
         MockHttpServletResponse response = mockMvc.perform(
                 org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(endpoint)
                         .accept(MediaType.APPLICATION_JSON)
@@ -170,7 +171,7 @@ class FunkoControllerTest {
     @Test
     @Order(7)
     void update() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0 , null , null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0 , null , null, null);
         when(funkoService.update(1L, dto)).thenReturn(funko);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -194,7 +195,7 @@ class FunkoControllerTest {
     @Test
     @Order(8)
     void updateNotFound() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0, null, null, null);
         when(funkoService.update(1L, dto)).thenThrow(new FunkoNotFoundException(funko.getId()));
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -215,7 +216,7 @@ class FunkoControllerTest {
     @Test
     @Order(9)
     void updateBadRequest() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto ("deberiaestarmal", -2.0, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto ("deberiaestarmal", -2.0, null, null, null);
         when(funkoService.update(1L, dto)).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio no puede ser menor o igual a 0"));
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -273,7 +274,7 @@ class FunkoControllerTest {
         doNothing().when(funkoService).deleteLogically(1L);
 
         MockHttpServletResponse response = mockMvc.perform(
-                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete(endpoint + "/logicalDelete/1")
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch(endpoint + "/1/desactivar")
                        .accept(MediaType.APPLICATION_JSON)
                        .param("logicalDelete", "true")
         ).andReturn().getResponse();
@@ -291,7 +292,7 @@ class FunkoControllerTest {
     void logicalDeleteByIdNotFound() throws Exception {
         doThrow(new FunkoNotFoundException(funko.getId())).when(funkoService).deleteLogically(1L);
         MockHttpServletResponse response = mockMvc.perform(
-                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete(endpoint + "/logicalDelete/1")
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch(endpoint + "/1/desactivar")
                        .accept(MediaType.APPLICATION_JSON)
                        .param("logicalDelete", "true")
         ).andReturn().getResponse();

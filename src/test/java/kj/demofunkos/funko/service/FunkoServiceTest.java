@@ -1,5 +1,7 @@
 package kj.demofunkos.funko.service;
 
+import kj.demofunkos.categoria.models.Categoria;
+import kj.demofunkos.categoria.repository.CategoriaRepository;
 import kj.demofunkos.funko.dto.FunkoCreateDto;
 import kj.demofunkos.funko.dto.FunkoUpdateDto;
 import kj.demofunkos.funko.exceptions.FunkoException;
@@ -14,8 +16,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,12 +28,17 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class FunkoServiceTest {
 
-    Funko funko = new Funko("FunkoTest", 10.0);
-    FunkoCreateDto createDto = new FunkoCreateDto("FunkoTest", 10.0, null, null);
-    FunkoUpdateDto updateDto = new FunkoUpdateDto("FunkoTest", null, null, null);
+    Categoria categoria = new Categoria(UUID.randomUUID(), "CategoriaTest", LocalDateTime.now(), LocalDateTime.now(), false, new ArrayList<>());
+
+    Funko funko = new Funko("FunkoTest", 10.0, categoria);
+    FunkoCreateDto createDto = new FunkoCreateDto("FunkoTest", 10.0, null, null, "CategoriaTest");
+    FunkoUpdateDto updateDto = new FunkoUpdateDto("FunkoTest", 1.0, null, null, "CategoriaTest");
 
     @Mock
     private FunkoRepository repository;
+
+    @Mock
+    private CategoriaRepository categoriaRepository;
 
     @Mock
     private FunkoMapper mapper;
@@ -79,8 +89,10 @@ class FunkoServiceTest {
 
     @Test
     void save() {
-        when(mapper.fromCreatetoEntity(createDto)).thenReturn(funko);
+        when(categoriaRepository.findByNombreIgnoreCase("CategoriaTest")).thenReturn(Optional.of(categoria));
+        when(mapper.fromCreatetoEntity(createDto, categoria)).thenReturn(funko);
         when(repository.save(funko)).thenReturn(funko);
+
 
         Funko funkoGuardado = service.save(createDto);
 
@@ -90,17 +102,22 @@ class FunkoServiceTest {
                 () -> assertEquals(funko.getPrecio(), funkoGuardado.getPrecio()),
                 () -> assertEquals(funko.getId(), funkoGuardado.getId()),
                 () -> assertEquals(funko.getFechaModificacion(), funkoGuardado.getFechaModificacion()),
-                () -> assertEquals(funko.getFechaAlta(), funkoGuardado.getFechaAlta())
+                () -> assertEquals(funko.getFechaAlta(), funkoGuardado.getFechaAlta()),
+                () -> assertFalse(funkoGuardado.isBorrado()),
+                () -> assertEquals(funko.getCategoria(), funkoGuardado.getCategoria()),
+                () -> assertEquals(funko.getDetalles(), funkoGuardado.getDetalles())
         );
-        verify(mapper, times(1)).fromCreatetoEntity(createDto);
+        verify(mapper, times(1)).fromCreatetoEntity(createDto, categoria);
         verify(repository, times(1)).save(funko);
+        verify(categoriaRepository, times(1)).findByNombreIgnoreCase("CategoriaTest");
     }
 
     @Test
     void update() {
         doNothing().when(funkoValidator).validarFunkoUpdateDto(updateDto);
         when(repository.findById(1L)).thenReturn(Optional.of(funko));
-        when(mapper.fromUpdateToEntity(funko, updateDto)).thenReturn(funko);
+        when(categoriaRepository.findByNombreIgnoreCase("CATEGORIATEST")).thenReturn(Optional.of(categoria));
+        when(mapper.fromUpdateToEntity(funko, updateDto, categoria)).thenReturn(funko);
         when(repository.save(funko)).thenReturn(funko);
 
         Funko funkoActualizado = service.update(1L, updateDto);
@@ -115,8 +132,9 @@ class FunkoServiceTest {
         );
         verify(funkoValidator, times(1)).validarFunkoUpdateDto(updateDto);
         verify(repository,times(1)).findById(1L);
-        verify(mapper, times(1)).fromUpdateToEntity(funko, updateDto);
+        verify(mapper, times(1)).fromUpdateToEntity(funko, updateDto, categoria);
         verify(repository, times(1)).save(funko);
+        verify(categoriaRepository, times(1)).findByNombreIgnoreCase("CATEGORIATEST");
     }
 
     @Test
@@ -129,7 +147,7 @@ class FunkoServiceTest {
 
         verify(funkoValidator).validarFunkoUpdateDto(updateDto);
         verify(repository).findById(1L);
-        verify(mapper, never()).fromUpdateToEntity(any(), any());
+        verify(mapper, never()).fromUpdateToEntity(any(), any(), any());
         verify(repository, never()).save(any());
     }
 
