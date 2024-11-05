@@ -43,6 +43,13 @@ public class CategoriaController {
         return ResponseEntity.ok(categoriaService.update(id, categoria));
     }
 
+    //Pensando en desactivar
+    @DeleteMapping("/realDelete/{id}")
+    public ResponseEntity<Void> realDeleteById(@PathVariable UUID id) {
+        categoriaService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PatchMapping("/{id}/desactivar")
     public ResponseEntity<Void> deactivateCategoria(@PathVariable UUID id) {
         categoriaService.deactivateCategoria(id);
@@ -57,12 +64,5 @@ public class CategoriaController {
     @GetMapping("/nombre/{nombre}")
     public ResponseEntity<Categoria> findByNombre(@PathVariable String nombre) {
         return ResponseEntity.ok(categoriaService.findByNombre(nombre));
-    }
-
-    //Pensando en desactivar
-    @DeleteMapping("/realDelete/{id}")
-    public ResponseEntity<Void> realDeleteById(@PathVariable UUID id) {
-        categoriaService.deleteById(id);
-        return ResponseEntity.noContent().build();
     }
 }

@@ -6,7 +6,6 @@ import kj.demofunkos.categoria.exceptions.CategoriaNotFoundException;
 import kj.demofunkos.categoria.mapper.CategoriaMapper;
 import kj.demofunkos.categoria.models.Categoria;
 import kj.demofunkos.categoria.repository.CategoriaRepository;
-import kj.demofunkos.funko.exceptions.FunkoNotFoundException;
 import kj.demofunkos.funko.model.Funko;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
@@ -76,7 +75,7 @@ public class CategoriaService {
     public void deactivateCategoria(UUID id){
         Optional<Categoria> categoria = categoriaRepository.findById(id);
         if (categoria.isEmpty()){
-            throw new CategoriaNotFoundException(id.toString());
+            throw new CategoriaNotFoundException(id);
         }
         categoria.get().setActiva(false);
         categoriaRepository.save(categoria.get());
@@ -86,13 +85,13 @@ public class CategoriaService {
     public Categoria reactivateCategoria(UUID id){
         Optional<Categoria> categoria = categoriaRepository.findById(id);
         if (categoria.isEmpty()){
-            throw new CategoriaNotFoundException(id.toString());
+            throw new CategoriaNotFoundException(id);
         }
         categoria.get().setActiva(true);
         return categoriaRepository.save(categoria.get());
     }
 
-    @CacheEvict(key = "#id")
+    @CacheEvict(cacheNames = {"categorias", "funkos"}, key = "#id", allEntries = true)
     public void deleteById(UUID id){
         Optional<Categoria> categoria = categoriaRepository.findById(id);
         if (categoria.isEmpty()){
@@ -105,7 +104,7 @@ public class CategoriaService {
 
     }
 
-    @Cacheable(key = "#id")
+    @Cacheable(key = "#result.id")
     public Categoria findByNombre(String nombre) {
         String nombreFiltrado = nombre.trim().toUpperCase();
         Optional<Categoria> categoria = categoriaRepository.findByNombreIgnoreCase(nombreFiltrado);

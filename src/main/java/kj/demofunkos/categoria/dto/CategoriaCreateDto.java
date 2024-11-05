@@ -13,4 +13,6 @@ public class CategoriaCreateDto {
     @NotBlank(message = "El nombre no puede estar vacío")
     @NotNull(message = "El nombre no puede ser nulo")
     private String nombre;
+
+    public CategoriaCreateDto() {}
 }

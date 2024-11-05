@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+
 @Component
 public class FunkoValidator {
 
@@ -30,6 +32,9 @@ public class FunkoValidator {
                 throw new FunkoBadRequestException("La fecha de fabricación no tiene el formato aaaa-mm-dd");
             }
         }
+//        if (LocalDate.now().isAfter(dto.getFechaDeFabricacion())) {
+//            throw new FunkoBadRequestException("La fecha de fabricación no puede ser mayor a la fecha actual");
+//        }
         if (dto.getNombreCategoria() != null && dto.getNombreCategoria().trim().equals("")) {
             throw new FunkoBadRequestException("El nombre de la categoria no puede estar vacio o ser espacios en blanco");
         }

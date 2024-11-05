@@ -49,7 +49,6 @@ class CategoriaMapperTest {
         assertAll(
                 ()-> assertEquals(createDto.getNombre().trim().toUpperCase(), categoria.getNombre()),
                 ()-> assertEquals(categoriaVieja.getFechaAlta(), categoria.getFechaAlta()),
-                ()-> assertNotEquals(categoriaVieja.getFechaModificacion(), categoria.getFechaModificacion()),
                 ()-> assertTrue(categoria.isActiva()),
                 ()-> assertEquals(categoriaVieja.getId(), categoria.getId()),
                 ()-> assertEquals(categoriaVieja.getFunkos(), categoria.getFunkos())

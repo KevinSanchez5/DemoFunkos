@@ -305,4 +305,101 @@ class FunkoControllerTest {
         verify(funkoService, times(1)).deleteLogically(1L);
     }
 
+    @Test
+    @Order(14)
+    void reactivateFunko() throws Exception {
+        when(funkoService.reactivateFunko(1L)).thenReturn(funko);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch(endpoint + "/1/activar")
+                       .accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+
+        Funko reactivatedFunko = mapper.readValue(response.getContentAsString(), Funko.class);
+
+        assertAll(
+                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
+                () -> assertNotNull(response.getContentAsString()),
+                () -> assertEquals(funko.getId(), reactivatedFunko.getId())
+        );
+
+        verify(funkoService, times(1)).reactivateFunko(1L);
+    }
+
+    @Test
+    @Order(15)
+    void reactivateFunkoNotFound() throws Exception {
+        when(funkoService.reactivateFunko(1L)).thenThrow(new FunkoNotFoundException(funko.getId()));
+
+        MockHttpServletResponse response = mockMvc.perform(
+                org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch(endpoint + "/1/activar")
+                       .accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+
+        assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus()),
+                () -> assertTrue(response.getContentAsString().isEmpty())
+        );
+
+        verify(funkoService, times(1)).reactivateFunko(1L);
+    }
+
+    @Test
+    @Order(16)
+    void findByNombre() throws Exception {
+        when(funkoService.findByNombreIgnoreCase("test")).thenReturn(funko);
+
+        MockHttpServletResponse response = mockMvc.perform(
+                get(endpoint + "/nombre/test").accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+
+        Funko funko = mapper.readValue(response.getContentAsString(), Funko.class);
+
+        assertAll(
+                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
+                () -> assertNotNull(funko),
+                () -> assertEquals("test", funko.getNombre())
+        );
+
+        verify(funkoService, times(1)).findByNombreIgnoreCase("test");
+    }
+
+    @Test
+    @Order(17)
+    void findByNombreNotFound() throws Exception {
+        when(funkoService.findByNombreIgnoreCase("test")).thenThrow(new FunkoNotFoundException("test"));
+
+        MockHttpServletResponse response = mockMvc.perform(
+                get(endpoint + "/nombre/test").accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+
+        assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND.value(), response.getStatus()),
+                () -> assertTrue(response.getContentAsString().isEmpty())
+        );
+
+        verify(funkoService, times(1)).findByNombreIgnoreCase("test");
+    }
+
+    @Test
+    @Order(18)
+    void findByPrecioBetween() throws Exception {
+        when(funkoService.findByPrecioBetween(1.0, 2.0)).thenReturn(List.of(funko));
+
+        MockHttpServletResponse response = mockMvc.perform(
+                get(endpoint + "/precio-entre?minimo=1.0&maximo=2.0").accept(MediaType.APPLICATION_JSON)
+        ).andReturn().getResponse();
+
+        List<Funko> funkos = mapper.readValue(response.getContentAsString(),
+                mapper.getTypeFactory().constructCollectionType(List.class, Funko.class));
+
+        assertAll(
+                () -> assertEquals(HttpStatus.OK.value(), response.getStatus()),
+                () -> assertFalse(funkos.isEmpty()),
+                () -> assertEquals(1, funkos.size())
+        );
+
+        verify(funkoService, times(1)).findByPrecioBetween(1.0, 2.0);
+    }
+
 }

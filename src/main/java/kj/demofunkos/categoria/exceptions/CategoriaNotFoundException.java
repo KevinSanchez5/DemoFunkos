@@ -9,10 +9,10 @@ import java.util.UUID;
 public class CategoriaNotFoundException extends CategoriaException{
 
     public CategoriaNotFoundException(UUID id){
-        super("Categoria con id " + id + " no encontrado");
+        super("Categoria con id " + id + " no encontrada");
     }
 
     public CategoriaNotFoundException(String nombre){
-        super("Categoria con nombre " + nombre + " no encontrado");
+        super("Categoria con nombre " + nombre + " no encontrada");
     }
 }

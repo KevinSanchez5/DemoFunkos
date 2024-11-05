@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class FunkoValidatorTest {
@@ -62,4 +64,16 @@ class FunkoValidatorTest {
         );
 
     }
+
+    @Test
+    void validarFunkoDescripcionVacia() {
+        FunkoUpdateDto dto = new FunkoUpdateDto("test", 1.2, "", null, null);
+
+        FunkoBadRequestException response = assertThrows(FunkoBadRequestException.class, () -> funkoValidator.validarFunkoUpdateDto(dto));
+
+        assertAll(
+                () -> assertEquals("La descripcion no puede estar vacia o ser espacios en blanco", response.getMessage())
+        );
+    }
+
 }

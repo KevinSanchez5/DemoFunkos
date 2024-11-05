@@ -12,9 +12,6 @@ import java.util.UUID;
 @Repository
 public interface CategoriaRepository extends JpaRepository<Categoria, UUID> {
 
-    @Query("SELECT c FROM Categoria c order by c.nombre asc")
-    List<Categoria> findAllByOrderByNombreAsc();
-
     @Query("SELECT c FROM Categoria c WHERE upper(c.nombre) = upper(?1)")
     Optional<Categoria> findByNombreIgnoreCase(String nombre);
 
