@@ -1,0 +1,214 @@
+{
+	"info": {
+		"_postman_id": "4029748e-9539-4618-b625-6d966dffe2b8",
+		"name": "FunkosDemo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "29759773"
+	},
+	"item": [
+		{
+			"name": "Categorias",
+			"item": [
+				{
+					"name": "crud",
+					"item": [
+						{
+							"name": "getAllCategorias",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "localhost:8080/categorias"
+							},
+							"response": []
+						},
+						{
+							"name": "getByIdCategorias",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "BQDoLeDzVjhGcfHMEqP6RwDUBZC7_3v8CPwPCr9U49zPZtWTcRTcZk-ij6NcGdnmu2fkggCmhqEJ03_Zsf9aTWBeNmpNlBAHGIc3yJVFalRydf82sx5n6s72PRy2fTX12XUTU7WUlU-4BNupQm34aipdT6dOfdqw58UjZ-MN4HywlHC3pZXwdNKvfscuhy0FU8AZM6tMF7ClO9cHImKD59q-ahVa2cKoBfUgNZI0zeER0AgKS8Aqdy8pOxgnxjEOiEN9a9FIbUxQvEUz6GXzHY5xgiETCGSg"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "localhost:8080/categorias/5f9e55c2-4053-4351-8666-5c3692efdac9"
+							},
+							"response": []
+						},
+						{
+							"name": "saveCategorias",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"nombre\": \" marvel \"\r\n}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/categorias"
+							},
+							"response": []
+						},
+						{
+							"name": "updateCategorias",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"nombre\": \" pokemon as\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/categorias/5f9e55c2-4053-4351-8666-5c3692efdac9"
+							},
+							"response": []
+						},
+						{
+							"name": "deleteRealCategorias",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": "localhost:8080/categorias/realDelete/1ac6cfb4-0d20-48c0-af26-580a93811c03"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "extra",
+					"item": [
+						{
+							"name": "desactivarCategorias",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": "localhost:8080/categorias/5f9e55c2-4053-4351-8666-5c3692efdac9/desactivar"
+							},
+							"response": []
+						},
+						{
+							"name": "reactivarCategoria",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": "localhost:8080/categorias/5f9e55c2-4053-4351-8666-5c3692efdac9/activar"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Funkos",
+			"item": [
+				{
+					"name": "crud",
+					"item": [
+						{
+							"name": "getAll",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": "localhost:8080/funkos"
+							},
+							"response": []
+						},
+						{
+							"name": "getById",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": {
+										"token": "BQDoLeDzVjhGcfHMEqP6RwDUBZC7_3v8CPwPCr9U49zPZtWTcRTcZk-ij6NcGdnmu2fkggCmhqEJ03_Zsf9aTWBeNmpNlBAHGIc3yJVFalRydf82sx5n6s72PRy2fTX12XUTU7WUlU-4BNupQm34aipdT6dOfdqw58UjZ-MN4HywlHC3pZXwdNKvfscuhy0FU8AZM6tMF7ClO9cHImKD59q-ahVa2cKoBfUgNZI0zeER0AgKS8Aqdy8pOxgnxjEOiEN9a9FIbUxQvEUz6GXzHY5xgiETCGSg"
+									}
+								},
+								"method": "GET",
+								"header": [],
+								"url": "localhost:8080/funkos/1"
+							},
+							"response": []
+						},
+						{
+							"name": "save",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"nombre\": \"  prueba \",\r\n    \"precio\": 1\r\n}\r\n\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/funkos"
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n   \"descripcion\":\"algo   2\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": "localhost:8080/funkos/3"
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": "localhost:8080/funkos/3"
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "extra",
+					"item": [
+						{
+							"name": "deleteLogically",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": "localhost:8080/funkos/1/desactivar"
+							},
+							"response": []
+						},
+						{
+							"name": "activateLogically",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": "localhost:8080/funkos/1/activar"
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}
