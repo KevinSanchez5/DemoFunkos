@@ -152,12 +152,4 @@ public class FunkoService {
         return funkoRepository.findByPrecioBetween(precioMinimo, precioMaximo);
     }
 
-    public boolean existeCateogoriaConNombre(String nombreCategoria){
-        String nombreFiltrado = nombreCategoria.trim().toUpperCase();
-        if(categoriaRepository.existsByNombre(nombreFiltrado)){
-            return true;
-        }else{
-            return false;
-        }
-    }
 }

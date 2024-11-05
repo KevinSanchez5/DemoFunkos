@@ -1,5 +1,6 @@
 package kj.demofunkos.funko.service;
 
+import kj.demofunkos.categoria.exceptions.CategoriaNotFoundException;
 import kj.demofunkos.categoria.models.Categoria;
 import kj.demofunkos.categoria.repository.CategoriaRepository;
 import kj.demofunkos.funko.dto.FunkoCreateDto;
@@ -113,6 +114,18 @@ class FunkoServiceTest {
     }
 
     @Test
+    void saveCategoriaNotFound(){
+        when(categoriaRepository.findByNombreIgnoreCase("CategoriaTest")).thenReturn(Optional.empty());
+
+        CategoriaNotFoundException e = assertThrows(CategoriaNotFoundException.class, () -> service.save(createDto));
+        assertEquals("Categoria con nombre CATEGORIATEST no encontrada", e.getMessage());
+
+        verify(mapper, never()).fromCreatetoEntity(createDto, categoria);
+        verify(repository, never()).save(funko);
+        verify(categoriaRepository, times(1)).findByNombreIgnoreCase("CategoriaTest");
+    }
+
+    @Test
     void update() {
         doNothing().when(funkoValidator).validarFunkoUpdateDto(updateDto);
         when(repository.findById(1L)).thenReturn(Optional.of(funko));
@@ -142,6 +155,7 @@ class FunkoServiceTest {
         doNothing().when(funkoValidator).validarFunkoUpdateDto(updateDto);
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
+
         FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.update(1L, updateDto));
         assertEquals("Funko con id 1 no encontrado", e.getMessage());
 
@@ -149,6 +163,23 @@ class FunkoServiceTest {
         verify(repository).findById(1L);
         verify(mapper, never()).fromUpdateToEntity(any(), any(), any());
         verify(repository, never()).save(any());
+        verify(categoriaRepository, never()).findByNombreIgnoreCase(any());
+    }
+
+    @Test
+    void updateCategoriaNotFound() {
+        doNothing().when(funkoValidator).validarFunkoUpdateDto(updateDto);
+        when(repository.findById(1L)).thenReturn(Optional.of(funko));
+        when(categoriaRepository.findByNombreIgnoreCase("CATEGORIATEST")).thenReturn(Optional.empty());
+
+        CategoriaNotFoundException e = assertThrows(CategoriaNotFoundException.class, () -> service.update(1L, updateDto));
+        assertEquals("Categoria con nombre CATEGORIATEST no encontrada", e.getMessage());
+
+        verify(funkoValidator).validarFunkoUpdateDto(updateDto);
+        verify(repository).findById(1L);
+        verify(mapper, never()).fromUpdateToEntity(any(), any(), any());
+        verify(repository, never()).save(any());
+        verify(categoriaRepository).findByNombreIgnoreCase("CATEGORIATEST");
     }
 
     @Test
@@ -192,6 +223,32 @@ class FunkoServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
         FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.deleteLogically(1L));
+        assertEquals("Funko con id 1 no encontrado", e.getMessage());
+
+        verify(repository, times(1)).findById(1L);
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void reactivateFunko() {
+        when(repository.findById(1L)).thenReturn(Optional.of(funko));
+        when(repository.save(funko)).thenReturn(funko);
+
+        Funko funkoReactivado = service.reactivateFunko(1L);
+
+        assertAll(
+                () -> assertFalse(funkoReactivado.isBorrado())
+        );
+
+        verify(repository, times(1)).findById(1L);
+        verify(repository, times(1)).save(funko);
+    }
+
+    @Test
+    void reactivateFunkoNotFound() throws FunkoException {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.reactivateFunko(1L));
         assertEquals("Funko con id 1 no encontrado", e.getMessage());
 
         verify(repository, times(1)).findById(1L);
