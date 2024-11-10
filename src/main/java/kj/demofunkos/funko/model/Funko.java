@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import kj.demofunkos.categoria.models.Categoria;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+
 import lombok.Data;
 
 import java.time.LocalDateTime;

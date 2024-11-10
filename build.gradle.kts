@@ -25,24 +25,26 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot Web
+    //Spring Boot Web
     implementation("org.springframework.boot:spring-boot-starter-web")
-    // Lombok
+    //Lombok
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
-    // Spring Boot Test
+    //Spring Boot Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    // Validación
+    //Validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
-    // Cache
+    //Cache
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    // JPA
+    //JPA
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    // H2
+    //H2
     implementation("com.h2database:h2") // base de datos a usar, puede ser otra
-    // Swagger
+    //Swagger
     implementation("io.springfox:springfox-boot-starter:3.0.0")
+    //Websocket
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
 }
 
 tasks.withType<Test> {

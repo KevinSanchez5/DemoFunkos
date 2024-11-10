@@ -21,13 +21,14 @@ public class FunkoCreateDto {
 
     private String descripcion;
 
+    @PastOrPresent(message = "La fecha de fabricación no puede ser futura")
+    private LocalDate fechaDeFabricacion;
+
     @NotNull(message = "El nombre de la categoria debe ingresarse")
     @NotEmpty(message = "El nombre de la categoria no puede estar vacio")
     @NotBlank(message = "El nombre de la categoria no puede estar en blanco")
     private String nombreCategoria;
 
-    @PastOrPresent(message = "La fecha de fabricación no puede ser futura")
-    private LocalDate fechaDeFabricacion;
 
 
     public FunkoCreateDto(String name, Double price, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {

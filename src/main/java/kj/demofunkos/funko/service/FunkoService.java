@@ -1,8 +1,14 @@
 package kj.demofunkos.funko.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import kj.demofunkos.categoria.exceptions.CategoriaNotFoundException;
 import kj.demofunkos.categoria.models.Categoria;
 import kj.demofunkos.categoria.repository.CategoriaRepository;
+import kj.demofunkos.config.websockets.WebSocketConfig;
+import kj.demofunkos.config.websockets.WebSocketHandler;
 import kj.demofunkos.funko.dto.FunkoCreateDto;
 import kj.demofunkos.funko.dto.FunkoUpdateDto;
 import kj.demofunkos.funko.exceptions.FunkoNotFoundException;
@@ -10,6 +16,8 @@ import kj.demofunkos.funko.mapper.FunkoMapper;
 import kj.demofunkos.funko.model.Funko;
 import kj.demofunkos.funko.repository.FunkoRepository;
 import kj.demofunkos.funko.validator.FunkoValidator;
+import kj.demofunkos.websocket.Notificacion;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,25 +25,34 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @CacheConfig(cacheNames = {"funkos"})
+@Slf4j
 public class FunkoService {
 
     private final FunkoRepository funkoRepository;
     private final CategoriaRepository categoriaRepository;
     private final FunkoMapper mapper;
     private final FunkoValidator funkoValidator;
+    private final WebSocketConfig webSocketConfig;
+    private WebSocketHandler webSocketService;
+    private final ObjectMapper jsonMapper;
 
     @Autowired
-    public FunkoService(FunkoRepository funkoRepository, FunkoMapper mapper, FunkoValidator funkoValidator, CategoriaRepository categoriaRepository) {
+    public FunkoService(FunkoRepository funkoRepository, FunkoMapper mapper, FunkoValidator funkoValidator, CategoriaRepository categoriaRepository, WebSocketConfig webSocketConfig, kj.demofunkos.config.websockets.WebSocketHandler webSocketService) {
         this.mapper = mapper;
         this.funkoRepository = funkoRepository;
         this.funkoValidator = funkoValidator;
         this.categoriaRepository = categoriaRepository;
+        this.webSocketConfig = webSocketConfig;
+        this.webSocketService = webSocketConfig.webSocketFunkosHandler();
+        this.jsonMapper = new ObjectMapper();
+        jsonMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
+        jsonMapper.registerModule(new JavaTimeModule());
     }
 
     public List<Funko> findAll() {
@@ -61,6 +78,7 @@ public class FunkoService {
             throw new CategoriaNotFoundException(funkoDto.getNombreCategoria().toUpperCase());
         }else {
             Funko funkoEntity = mapper.fromCreatetoEntity(funkoDto, categoriaParaFunko.get());
+            onChange(Notificacion.Tipo.CREATE, funkoEntity);
             return funkoRepository.save(funkoEntity);
         }
     }
@@ -82,6 +100,7 @@ public class FunkoService {
                 }else {categoriaFinal = categoria.get();}
             }
             Funko funkoEntity = mapper.fromUpdateToEntity(funkoOptional.get(), dto, categoriaFinal);
+            onChange(Notificacion.Tipo.UPDATE, funkoEntity);
                 return funkoRepository.save(funkoEntity);
         }
         else {
@@ -95,6 +114,7 @@ public class FunkoService {
         if (!funko) {
             throw new FunkoNotFoundException(id);
         }
+        onChange(Notificacion.Tipo.DELETE, funkoRepository.findById(id).get());
         funkoRepository.deleteById(id);
     }
 
@@ -105,6 +125,7 @@ public class FunkoService {
             throw new FunkoNotFoundException(id);
         }
         funko.get().setBorrado(true);
+        onChange(Notificacion.Tipo.UPDATE, funko.get());
         funkoRepository.save(funko.get());
     }
 
@@ -115,6 +136,7 @@ public class FunkoService {
             throw new FunkoNotFoundException(id);
         }
         funko.get().setBorrado(false);
+        onChange(Notificacion.Tipo.UPDATE, funko.get());
         return funkoRepository.save(funko.get());
     }
 
@@ -150,6 +172,38 @@ public class FunkoService {
 
     public List<Funko> findByPrecioBetween(Double precioMinimo, Double precioMaximo){
         return funkoRepository.findByPrecioBetween(precioMinimo, precioMaximo);
+    }
+
+    void onChange(Notificacion.Tipo tipo, Funko data){
+        if(webSocketService == null) {
+            log.warn("No se pudo enviar la notificacion al WebSocket");
+            webSocketService = this.webSocketConfig.webSocketFunkosHandler();
+        }
+
+        try{
+            Notificacion<Funko> notificacion = new Notificacion<Funko>(
+                    "FUNKO",
+                    tipo,
+                    data
+            );
+            String json = jsonMapper.writeValueAsString((notificacion));
+            log.info("Enviando mensaje a los clientes ws");
+            Thread senderThread = new Thread(() -> {
+                try {
+                    webSocketService.sendMessage(json);
+                } catch (Exception e) {
+                    log.error("Error al enviar mensaje por WebSocket", e);
+                }
+            });
+            senderThread.start();
+        } catch (JsonProcessingException e){
+            log.error("Error al serializar la notificacion", e);
+        }
+
+    }
+
+    public void setWebSocketService(WebSocketHandler webSocketService) {
+        this.webSocketService = webSocketService;
     }
 
 }

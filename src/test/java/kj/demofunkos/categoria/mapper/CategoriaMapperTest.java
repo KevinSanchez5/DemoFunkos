@@ -32,7 +32,7 @@ class CategoriaMapperTest {
         Categoria categoria = mapper.fromDtoToEntity(dto);
 
         assertAll(
-                ()-> assertEquals(dto.getNombre().trim().toUpperCase(), categoria.getNombre()),
+                ()-> assertEquals("TESTCATEGORIADTO", categoria.getNombre()),
                 ()-> assertNotNull(categoria.getFechaAlta()),
                 ()-> assertNotNull(categoria.getFechaModificacion()),
                 ()-> assertTrue(categoria.isActiva()),
