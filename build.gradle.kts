@@ -45,6 +45,8 @@ dependencies {
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     //Websocket
     implementation("org.springframework.boot:spring-boot-starter-websocket")
+    //Jackson XML
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml")
 }
 
 tasks.withType<Test> {

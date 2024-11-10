@@ -244,7 +244,7 @@ class CategoriaServiceTest {
         assertEquals("Categoria con id " + id + " no encontrada", exception.getMessage());
 
         verify(repository, times(1)).findById(id);
-        verify(repository, never()).delete(any());
+        verify(repository, never()).deleteById(any());
     }
 
     @Test

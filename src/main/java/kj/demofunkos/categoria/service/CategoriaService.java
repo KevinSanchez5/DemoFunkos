@@ -12,6 +12,9 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,6 +33,22 @@ public class CategoriaService {
         this.mapper = mapper;
         this.categoriaRepository = categoriaRepository;
     }
+
+
+    public Page<Categoria> findAllPaged(Optional<String> nombre, Optional<Boolean> activa, Pageable pageable ) {
+        Specification<Categoria> specNombreCategoria = (root, query, criteriaBuilder) ->
+                nombre.map(nom -> criteriaBuilder.like(criteriaBuilder.upper(root.get("nombre")), "%" + nom.toUpperCase() + "%"))
+                        .orElseGet(()-> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Categoria> specActivaCategoria = (root, query, criteriaBuilder) ->
+                activa.map(act -> criteriaBuilder.equal(root.get("activa"), act))
+                        .orElseGet(()-> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Categoria> criterio = Specification.where(specNombreCategoria).and(specActivaCategoria);
+
+        return categoriaRepository.findAll(criterio, pageable);
+    }
+
 
     public List<Categoria> findAll (){
         List<Categoria> list;
