@@ -30,7 +30,7 @@ class DeprecatedRepositoryTest {
 
     @Test
     void findById() {
-        Funko funko = new Funko("Funko 1", 1.0, null);
+        Funko funko = new Funko("Funko 1", 1.0, 10, null);
         Funko funkoGuardado =repository.save(funko);
 
         Funko funkoEncontrado = repository.findById(funkoGuardado.getId());
@@ -54,7 +54,7 @@ class DeprecatedRepositoryTest {
     }
     @Test
     void save() {
-        Funko funko = new Funko("test", 1.0, null);
+        Funko funko = new Funko("test", 1.0, 10, null);
 
         Funko funkoSaved = repository.save(funko);
         System.out.println(funkoSaved.getId());
@@ -69,7 +69,7 @@ class DeprecatedRepositoryTest {
 
     @Test
     void update() {
-        Funko funko = new Funko("test", 1.0, null);
+        Funko funko = new Funko("test", 1.0, 10, null);
         Funko funkoSaved = repository.save(funko);
 
         funko.setNombre("testUpdated");
@@ -88,7 +88,7 @@ class DeprecatedRepositoryTest {
 
     @Test
     void deleteById() {
-        Funko funko = new Funko("test", 1.0, null);
+        Funko funko = new Funko("test", 1.0, 10, null);
         Funko funkoSaved = repository.save(funko);
 
         repository.deleteById(funkoSaved.getId());

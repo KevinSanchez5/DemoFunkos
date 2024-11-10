@@ -19,6 +19,10 @@ public class FunkoCreateDto {
     @NotNull(message = "El precio no puede ser nulo")
     private final Double precio;
 
+    @PositiveOrZero(message = "El stock debe ser mayor o igual que 0")
+    @NotNull(message = "El stock no puede ser nulo")
+    private final Integer stock;
+
     private String descripcion;
 
     @PastOrPresent(message = "La fecha de fabricación no puede ser futura")
@@ -31,9 +35,10 @@ public class FunkoCreateDto {
 
 
 
-    public FunkoCreateDto(String name, Double price, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {
+    public FunkoCreateDto(String name, Double price, Integer stock, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {
         this.nombre = name;
         this.precio = price;
+        this.stock = stock;
         this.descripcion = descripcion;
         this.fechaDeFabricacion = fechaDeFabricacion;
         this.nombreCategoria = nombreCategoria;

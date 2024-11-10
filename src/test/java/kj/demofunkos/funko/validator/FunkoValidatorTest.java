@@ -23,14 +23,14 @@ class FunkoValidatorTest {
 
     @Test
     void validarFunkoUpdateDtoSuccess() {
-        FunkoUpdateDto dto = new FunkoUpdateDto("test", 1.0, null, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("test", 1.0, 10, null, null, null);
 
          assertDoesNotThrow(()-> funkoValidator.validarFunkoUpdateDto(dto));
     }
 
     @Test
     void validarFunkoUpdateAllAtributesNull() {
-        FunkoUpdateDto dto = new FunkoUpdateDto(null, null, null, null,null);
+        FunkoUpdateDto dto = new FunkoUpdateDto(null, null, null, null, null,null);
 
         FunkoBadRequestException response = assertThrows(FunkoBadRequestException.class, () -> funkoValidator.validarFunkoUpdateDto(dto));
 
@@ -42,7 +42,7 @@ class FunkoValidatorTest {
 
     @Test
     void validarFunkoPrecioMenorOIgualACero() {
-        FunkoUpdateDto dto = new FunkoUpdateDto("test", -1.0, null, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("test", -1.0, 10, null, null, null);
 
         FunkoBadRequestException response = assertThrows(FunkoBadRequestException.class, () -> funkoValidator.validarFunkoUpdateDto(dto));
 
@@ -55,7 +55,7 @@ class FunkoValidatorTest {
 
     @Test
     void validarFunkoNombreVacio() {
-        FunkoUpdateDto dto = new FunkoUpdateDto("" , 1.2, null , null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("" , 1.2, 10, null , null, null);
 
         FunkoBadRequestException response = assertThrows(FunkoBadRequestException.class, () -> funkoValidator.validarFunkoUpdateDto(dto));
 
@@ -67,12 +67,23 @@ class FunkoValidatorTest {
 
     @Test
     void validarFunkoDescripcionVacia() {
-        FunkoUpdateDto dto = new FunkoUpdateDto("test", 1.2, "", null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("test", 1.2, 10, "", null, null);
 
         FunkoBadRequestException response = assertThrows(FunkoBadRequestException.class, () -> funkoValidator.validarFunkoUpdateDto(dto));
 
         assertAll(
                 () -> assertEquals("La descripcion no puede estar vacia o ser espacios en blanco", response.getMessage())
+        );
+    }
+
+    @Test
+    void validarFunkoStockMenorQueCero() {
+        FunkoUpdateDto dto = new FunkoUpdateDto("test", 1.2, -1, null, null, null);
+
+        FunkoBadRequestException response = assertThrows(FunkoBadRequestException.class, () -> funkoValidator.validarFunkoUpdateDto(dto));
+
+        assertAll(
+                () -> assertEquals("El stock no puede ser menor a 0", response.getMessage())
         );
     }
 

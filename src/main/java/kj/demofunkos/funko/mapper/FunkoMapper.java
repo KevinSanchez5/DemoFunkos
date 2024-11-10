@@ -14,13 +14,14 @@ public class FunkoMapper {
 
     public FunkoCreateDto fromEntitytoCreateDto(Funko funko) {
         return new FunkoCreateDto(funko.getNombre(), funko.getPrecio(),
+                funko.getStock(),
                 funko.getDetalles().getDescripcion()
                 , funko.getDetalles().getFechaDeFabricacion(), funko.getCategoria().getNombre());
     }
 
     public Funko fromCreatetoEntity(FunkoCreateDto funkoCreateDto, Categoria categoria) {
 
-        Funko nuevoFunko = new Funko(funkoCreateDto.getNombre().trim(), funkoCreateDto.getPrecio(), categoria);
+        Funko nuevoFunko = new Funko(funkoCreateDto.getNombre().trim(), funkoCreateDto.getPrecio(), funkoCreateDto.getStock(), categoria);
 
         nuevoFunko.setDetalles(new Detalles(
                 funkoCreateDto.getDescripcion() != null ? funkoCreateDto.getDescripcion().trim() : null,
@@ -40,6 +41,7 @@ public class FunkoMapper {
                 funkoViejo.getId(),
                 funkoUpdateDto.getNombre() != null ? funkoUpdateDto.getNombre().trim() : funkoViejo.getNombre(),
                 funkoUpdateDto.getPrecio() != null ? funkoUpdateDto.getPrecio() : funkoViejo.getPrecio(),
+                funkoUpdateDto.getStock() != null ? funkoUpdateDto.getStock() : funkoViejo.getStock(),
                 funkoViejo.getFechaAlta(),
                 LocalDateTime.now(),
                 false,

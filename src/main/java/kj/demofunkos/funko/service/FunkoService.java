@@ -110,11 +110,11 @@ public class FunkoService {
 
     @CacheEvict(key = "#id")
     public void deleteById(Long id) {
-        boolean funko = funkoRepository.existsById(id);
-        if (!funko) {
+        Optional<Funko> funko = funkoRepository.findById(id);
+        if (funko.isEmpty()) {
             throw new FunkoNotFoundException(id);
         }
-        onChange(Notificacion.Tipo.DELETE, funkoRepository.findById(id).get());
+        onChange(Notificacion.Tipo.DELETE, funko.get());
         funkoRepository.deleteById(id);
     }
 

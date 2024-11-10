@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import kj.demofunkos.categoria.models.Categoria;
 import lombok.AllArgsConstructor;
 
@@ -29,6 +30,10 @@ public class Funko {
     @Positive(message = "El precio debe ser mayor que 0")
     private Double precio;
 
+    @Column(name = "stock")
+    @PositiveOrZero(message = "El stock debe ser mayor o igual que 0")
+    private Integer stock;
+
     @Column(name = "fecha_alta")
     private LocalDateTime fechaAlta;
 
@@ -48,10 +53,11 @@ public class Funko {
 
     public Funko() {}
 
-    public Funko(String nombre, Double precio, Categoria categoria) {
+    public Funko(String nombre, Double precio, Integer stock, Categoria categoria) {
         this.id = null;
         this.nombre = nombre;
         this.precio = precio;
+        this.stock = stock;
         this.fechaAlta = LocalDateTime.now();
         this.fechaModificacion = LocalDateTime.now();
         this.borrado = false;

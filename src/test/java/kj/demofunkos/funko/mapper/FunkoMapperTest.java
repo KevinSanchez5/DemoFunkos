@@ -18,7 +18,7 @@ class FunkoMapperTest {
     FunkoMapper mapper;
 
     Categoria categoriaVieja = new Categoria(UUID.randomUUID(), "testCategoria", LocalDateTime.now(), LocalDateTime.now(), true, new ArrayList<>());
-    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, LocalDateTime.now(), LocalDateTime.now(), false , null, categoriaVieja);
+    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, 10, LocalDateTime.now(), LocalDateTime.now(), false , null, categoriaVieja);
 
 
     @BeforeEach
@@ -29,12 +29,13 @@ class FunkoMapperTest {
 
     @Test
     void fromEntitytoCreateDto() {
-        Funko funko = new Funko("testViejo", 1.0, categoriaVieja);
+        Funko funko = new Funko("testViejo", 1.0, 10, categoriaVieja);
         FunkoCreateDto dto = mapper.fromEntitytoCreateDto(funko);
 
         assertAll(
                 ()-> assertEquals(funko.getNombre(), dto.getNombre()),
                 ()-> assertEquals(funko.getPrecio(), dto.getPrecio()),
+                ()-> assertEquals(funko.getStock(), dto.getStock()),
                 ()-> assertEquals(funko.getDetalles().getDescripcion(), dto.getDescripcion()),
                 ()-> assertEquals(funko.getDetalles().getFechaDeFabricacion(), dto.getFechaDeFabricacion()),
                 ()-> assertFalse(funko.isBorrado()),
@@ -44,7 +45,7 @@ class FunkoMapperTest {
 
     @Test
     void fromCreatetoEntity() {
-        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, null, null, "algo");
+        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, 10,null, null, "algo");
         Funko funko = mapper.fromCreatetoEntity(dto, categoriaVieja);
 
         assertAll(
@@ -60,7 +61,7 @@ class FunkoMapperTest {
     @Test
     void fromUpdateToEntity() {
 
-        FunkoUpdateDto dto = new FunkoUpdateDto("testNuevo", null, null, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("testNuevo", null,10, null, null, null);
         Funko funkoUpdated = mapper.fromUpdateToEntity(funkoViejo, dto, null);
 
         assertAll(

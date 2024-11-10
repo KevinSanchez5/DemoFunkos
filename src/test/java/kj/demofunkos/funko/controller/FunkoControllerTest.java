@@ -34,7 +34,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 class FunkoControllerTest {
-    Funko funko = new Funko(1L, "test", 1.0, LocalDateTime.now(), LocalDateTime.now(), false, null, null);
+    Funko funko = new Funko(1L, "test", 1.0, 10, LocalDateTime.now(), LocalDateTime.now(), false, null, null);
 
     ObjectMapper mapper = new ObjectMapper();
     @MockBean
@@ -128,7 +128,7 @@ class FunkoControllerTest {
     @Test
     @Order(5)
     void save() throws Exception{
-        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, null, null, "algo");
+        FunkoCreateDto dto = new FunkoCreateDto("test", 1.0, 10, null, null, "algo");
         when(funkoService.save(dto)).thenReturn(funko);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -152,7 +152,7 @@ class FunkoControllerTest {
     @Test
     @Order(6)
     void saveBadRequest() throws Exception {
-        FunkoCreateDto dto = new FunkoCreateDto("", 1.0, null, null, null);
+        FunkoCreateDto dto = new FunkoCreateDto("", 1.0, 10, null, null, null);
         MockHttpServletResponse response = mockMvc.perform(
                 org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post(endpoint)
                         .accept(MediaType.APPLICATION_JSON)
@@ -171,7 +171,7 @@ class FunkoControllerTest {
     @Test
     @Order(7)
     void update() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0 , null , null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0 , 10, null , null, null);
         when(funkoService.update(1L, dto)).thenReturn(funko);
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -195,7 +195,7 @@ class FunkoControllerTest {
     @Test
     @Order(8)
     void updateNotFound() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0, null, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto("updated", 2.0, 10, null, null, null);
         when(funkoService.update(1L, dto)).thenThrow(new FunkoNotFoundException(funko.getId()));
 
         MockHttpServletResponse response = mockMvc.perform(
@@ -216,7 +216,7 @@ class FunkoControllerTest {
     @Test
     @Order(9)
     void updateBadRequest() throws Exception {
-        FunkoUpdateDto dto = new FunkoUpdateDto ("deberiaestarmal", -2.0, null, null, null);
+        FunkoUpdateDto dto = new FunkoUpdateDto ("deberiaestarmal", -2.0, 10, null, null, null);
         when(funkoService.update(1L, dto)).thenThrow(new ResponseStatusException(HttpStatus.BAD_REQUEST, "El precio no puede ser menor o igual a 0"));
 
         MockHttpServletResponse response = mockMvc.perform(

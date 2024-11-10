@@ -17,7 +17,7 @@ class CategoriaMapperTest {
 
     CategoriaMapper mapper;
 
-    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, LocalDateTime.now(), LocalDateTime.now(), false , null, null);
+    Funko funkoViejo = new Funko(1L, "testViejo", 1.0, 10, LocalDateTime.now(), LocalDateTime.now(), false , null, null);
     Categoria categoriaVieja = new Categoria(UUID.randomUUID(), "testCategoria", LocalDateTime.now(), LocalDateTime.now(), true, new ArrayList<>());
 
     @BeforeEach

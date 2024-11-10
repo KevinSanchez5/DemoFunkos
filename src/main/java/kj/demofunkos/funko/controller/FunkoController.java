@@ -6,12 +6,14 @@ import kj.demofunkos.funko.dto.FunkoCreateDto;
 import kj.demofunkos.funko.dto.FunkoUpdateDto;
 import kj.demofunkos.funko.model.Funko;
 import kj.demofunkos.funko.service.FunkoService;
+import kj.demofunkos.utils.pagination.PageResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/funkos")
@@ -23,6 +25,17 @@ public class FunkoController {
     public FunkoController(FunkoService funkoService) {
         this.funkoService = funkoService;
     }
+
+//    @GetMapping("/paged")
+//    public ResponseEntity<PageResponse<Funko>> findAllPaged(
+//            @RequestParam(required = false) Optional<String> nombre,
+//            @RequestParam(required = false, defaultValue = "false") Optional<Boolean> borrado,
+//            @RequestParam(required = false) Optional<Double> precioMaximo,
+//            @RequestParam(defaultValue = "0") Integer page,
+//            @RequestParam(defaultValue = "10") Integer size
+//    ) {
+//        return ResponseEntity.ok(funkoService.findAllPaged(page, size));
+//    }
 
     @GetMapping
     public ResponseEntity<List<Funko>> findAll() {

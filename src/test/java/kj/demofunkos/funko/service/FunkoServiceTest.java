@@ -3,6 +3,8 @@ package kj.demofunkos.funko.service;
 import kj.demofunkos.categoria.exceptions.CategoriaNotFoundException;
 import kj.demofunkos.categoria.models.Categoria;
 import kj.demofunkos.categoria.repository.CategoriaRepository;
+import kj.demofunkos.config.websockets.WebSocketConfig;
+import kj.demofunkos.config.websockets.WebSocketHandler;
 import kj.demofunkos.funko.dto.FunkoCreateDto;
 import kj.demofunkos.funko.dto.FunkoUpdateDto;
 import kj.demofunkos.funko.exceptions.FunkoException;
@@ -31,9 +33,9 @@ class FunkoServiceTest {
 
     Categoria categoria = new Categoria(UUID.randomUUID(), "CategoriaTest", LocalDateTime.now(), LocalDateTime.now(), false, new ArrayList<>());
 
-    Funko funko = new Funko("FunkoTest", 10.0, categoria);
-    FunkoCreateDto createDto = new FunkoCreateDto("FunkoTest", 10.0, null, null, "CategoriaTest");
-    FunkoUpdateDto updateDto = new FunkoUpdateDto("FunkoTest", 1.0, null, null, "CategoriaTest");
+    Funko funko = new Funko("FunkoTest", 10.0, 10, categoria);
+    FunkoCreateDto createDto = new FunkoCreateDto("FunkoTest", 10.0, 10, null, null, "CategoriaTest");
+    FunkoUpdateDto updateDto = new FunkoUpdateDto("FunkoTest", 1.0, 10, null, null, "CategoriaTest");
 
     @Mock
     private FunkoRepository repository;
@@ -46,6 +48,12 @@ class FunkoServiceTest {
 
     @Mock
     private FunkoValidator funkoValidator;
+
+    @Mock
+    private WebSocketConfig webSocketConfig;
+
+    @Mock
+    private WebSocketHandler webSocketService;
 
     @InjectMocks
     private FunkoService service;
@@ -184,23 +192,24 @@ class FunkoServiceTest {
 
     @Test
     void deleteById() {
-        when(repository.existsById(1L)).thenReturn(true);
+        when(repository.findById(1L)).thenReturn(Optional.of(funko));
         doNothing().when(repository).deleteById(1L);
 
         service.deleteById(1L);
 
-        verify(repository, times(1)).existsById(1L);
+        verify(repository, times(1)).findById(1L);
         verify(repository, times(1)).deleteById(1L);
     }
 
     @Test
     void deleteByIdNotFound() {
-        when(repository.existsById(1L)).thenReturn(false);
+        when(repository.findById(1L)).thenReturn(Optional.empty());
 
         FunkoNotFoundException e = assertThrows(FunkoNotFoundException.class, () -> service.deleteById(1L));
         assertEquals("Funko con id 1 no encontrado", e.getMessage());
 
-        verify(repository, times(1)).existsById(1L);
+        verify(repository, times(1)).findById(1L);
+        verify(repository, never()).deleteById(anyLong());
     }
 
     @Test

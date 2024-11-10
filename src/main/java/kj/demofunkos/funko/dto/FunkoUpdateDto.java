@@ -15,6 +15,8 @@ public class FunkoUpdateDto {
 
     private  Double precio;
 
+    private Integer stock;
+
     private String descripcion;
 
     private String nombreCategoria;
@@ -25,9 +27,10 @@ public class FunkoUpdateDto {
     public FunkoUpdateDto() {}
 
 
-    public FunkoUpdateDto(String nombre, Double precio, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {
+    public FunkoUpdateDto(String nombre, Double precio, Integer stock, String descripcion, LocalDate fechaDeFabricacion, String nombreCategoria) {
         this.nombre = nombre;
         this.precio = precio;
+        this.stock = stock;
         this.descripcion = descripcion;
         this.fechaDeFabricacion = fechaDeFabricacion;
         this.nombreCategoria = nombreCategoria;
