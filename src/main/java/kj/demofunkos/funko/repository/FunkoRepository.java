@@ -1,7 +1,9 @@
 package kj.demofunkos.funko.repository;
 
+import kj.demofunkos.categoria.models.Categoria;
 import kj.demofunkos.funko.model.Funko;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -9,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface FunkoRepository extends JpaRepository<Funko, Long> {
+public interface FunkoRepository extends JpaRepository<Funko, Long>, JpaSpecificationExecutor<Funko> {
 
     @Query("select f from Funko f where upper(f.nombre) = upper(?1)")
     Optional<Funko> findByNombreIgnoreCase(String nombre);

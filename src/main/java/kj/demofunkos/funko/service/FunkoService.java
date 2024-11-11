@@ -23,6 +23,9 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 
@@ -54,6 +57,31 @@ public class FunkoService {
         jsonMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS,false);
         jsonMapper.registerModule(new JavaTimeModule());
     }
+
+
+    public Page<Funko> findAllPaged(Optional<String> nombre, Optional<Boolean> borrado, Optional<Double> precioMinimo, Optional<Double> precioMaximo, Pageable pageable ) {
+        Specification<Funko> specNombreCategoria = (root, query, criteriaBuilder) ->
+                nombre.map(nom -> criteriaBuilder.like(criteriaBuilder.upper(root.get("nombre")), "%" + nom.toUpperCase() + "%"))
+                        .orElseGet(()-> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Funko> specActivaCategoria = (root, query, criteriaBuilder) ->
+                borrado.map(bor -> criteriaBuilder.equal(root.get("borrado"), bor))
+                        .orElseGet(()-> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Funko> specPrecioMinimo = (root, query, criteriaBuilder) ->
+                precioMinimo.map(pMin -> criteriaBuilder.greaterThanOrEqualTo(root.get("precio"), pMin))
+                        .orElseGet(()-> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Funko> specPrecioMaximo = (root, query, criteriaBuilder) ->
+                precioMaximo.map(pMax -> criteriaBuilder.lessThanOrEqualTo(root.get("precio"), pMax))
+                        .orElseGet(()-> criteriaBuilder.isTrue(criteriaBuilder.literal(true)));
+
+        Specification<Funko> criterio = Specification.where(specNombreCategoria).and(specActivaCategoria)
+                .and(specPrecioMinimo).and(specPrecioMaximo);
+
+        return funkoRepository.findAll(criterio, pageable);
+    }
+
 
     public List<Funko> findAll() {
         List<Funko> list;
