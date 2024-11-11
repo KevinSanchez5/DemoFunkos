@@ -8,8 +8,8 @@ INSERT INTO categorias(id, nombre, fecha_alta, fecha_modificacion, activa) VALUE
 
 
 
-INSERT INTO funkos (nombre, precio, fecha_alta, fecha_modificacion, borrado, descripcion, fecha_de_fabricacion, categoria_id) VALUES ('Funko 1', 10.0, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), false, 'Descripcion de prueba', '2023-01-01', '399c98c4-5d81-4d3f-bb30-2b90922eedf2');
-INSERT INTO funkos (nombre, precio, fecha_alta, fecha_modificacion, borrado, categoria_id) VALUES ('Funko 2', 20.0, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), false, '5a5bb9e4-203f-4358-9460-54a501a244cc');
+INSERT INTO funkos (nombre, precio, stock, fecha_alta, fecha_modificacion, borrado, descripcion, fecha_de_fabricacion, categoria_id) VALUES ('Funko 1', 10.0, 10, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), false, 'Descripcion de prueba', '2023-01-01', '399c98c4-5d81-4d3f-bb30-2b90922eedf2');
+INSERT INTO funkos (nombre, precio, stock, fecha_alta, fecha_modificacion, borrado, categoria_id) VALUES ('Funko 2', 20.0, 10, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP(), false, '5a5bb9e4-203f-4358-9460-54a501a244cc');
 
 
 

@@ -41,6 +41,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     //H2
     implementation("com.h2database:h2") // base de datos a usar, puede ser otra
+    //MongoDB
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     //Swagger
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     //Websocket
